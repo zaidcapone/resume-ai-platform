@@ -1,430 +1,96 @@
-// Professional Resume Parser - Hybrid Approach
-const AFFINDA_API_KEY = 'demo'; // Start with demo, replace with real key later
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI - Smart Resume Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg mr-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">ResumeAI</h1>
+                </div>
+                <div class="text-sm text-gray-600">
+                    Testing Mode - No Login Required
+                </div>
+            </div>
+        </div>
+    </nav>
 
-// Enhanced professional file upload handler
-document.getElementById('resumeUpload').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    <!-- Main App - NO LOGIN REQUIRED -->
+    <div id="appSection">
+        <!-- Tabs Navigation -->
+        <div class="bg-white border-b">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex space-x-8">
+                    <button class="tab-button py-4 px-2 border-b-2 border-blue-600 font-medium text-blue-600" data-tab="builder">
+                        📝 Resume Builder
+                    </button>
+                    <button class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700" data-tab="review">
+                        🤖 AI Review
+                    </button>
+                    <button class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700" data-tab="customizer">
+                        🎯 Job Customizer
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    // Show professional loading state
-    showParsingLoader();
-    
-    try {
-        let parsedData;
-        
-        // Smart file type routing
-        if (file.name.toLowerCase().endsWith('.docx')) {
-            // Premium parsing for Word documents
-            parsedData = await parseWithAffindaAPI(file);
-        } else if (file.name.toLowerCase().endsWith('.pdf')) {
-            // Good quality PDF parsing
-            parsedData = await parsePDFWithOCR(file);
-        } else {
-            // Basic text extraction for other formats
-            parsedData = await extractBasicText(file);
+        <!-- Tab Contents -->
+        <div class="max-w-7xl mx-auto py-8 px-4">
+            
+            <!-- TAB 1: Resume Builder -->
+            <div id="builder" class="tab-content">
+                <!-- [KEEP ALL YOUR EXISTING BUILDER CONTENT EXACTLY AS IS] -->
+                <!-- Copy everything from your current builder tab here -->
+                <!-- This includes: upload section, form fields, progress tracking, etc. -->
+            </div>
+
+            <!-- TAB 2: AI Review -->
+            <div id="review" class="tab-content hidden">
+                <!-- [KEEP ALL YOUR EXISTING AI REVIEW CONTENT] -->
+            </div>
+
+            <!-- TAB 3: Job Customizer -->
+            <div id="customizer" class="tab-content hidden">
+                <!-- [KEEP ALL YOUR EXISTING CUSTOMIZER CONTENT] -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // [PASTE THE ENTIRE PROFESSIONAL PARSING SCRIPT I GAVE YOU HERE]
+        // This includes all the resume parsing, auto-fill, career detection code
+        // But REMOVE all Firebase and login-related functions
+    </script>
+
+    <style>
+        .radial-progress {
+            background: radial-gradient(closest-side, white 79%, transparent 80% 100%),
+            conic-gradient(currentColor calc(var(--value)*1%), #e5e7eb 0);
         }
         
-        autoFillFormWithParsedData(parsedData);
-        showParsingSuccess(parsedData.fileType);
-        
-    } catch (error) {
-        console.error('Parsing error:', error);
-        // Fallback to intelligent sample data
-        await fallbackToSmartAutoFill(file);
-    }
-});
-
-// 1. Premium Word Document Parser (Affinda API)
-async function parseWithAffindaAPI(file) {
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await fetch('https://api.affinda.com/v2/documents', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${AFFINDA_API_KEY}`
-            },
-            body: formData
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            return {
-                ...extractStructuredData(data),
-                fileType: 'premium',
-                source: 'affinda_api'
-            };
+        .section-group {
+            transition: all 0.3s ease;
         }
-    } catch (error) {
-        console.warn('Affinda API failed, falling back to OCR');
-        throw error;
-    }
-}
-
-// 2. Good Quality PDF Parser
-async function parsePDFWithOCR(file) {
-    // For now, simulate good PDF parsing
-    // In production, integrate with pdf-parse + Tesseract.js
-    return await simulatePDFParsing(file);
-}
-
-// 3. Basic Text Extractor
-async function extractBasicText(file) {
-    return await simulateBasicExtraction(file);
-}
-
-// Intelligent fallback with realistic data
-async function fallbackToSmartAutoFill(file) {
-    const fileName = file.name.toLowerCase();
-    
-    // Smart detection based on filename and type
-    let sampleData;
-    
-    if (fileName.includes('developer') || fileName.includes('engineer')) {
-        sampleData = getTechSampleData();
-    } else if (fileName.includes('manager') || fileName.includes('director')) {
-        sampleData = getManagementSampleData();
-    } else if (fileName.includes('designer') || fileName.includes('creative')) {
-        sampleData = getCreativeSampleData();
-    } else {
-        sampleData = getGenericSampleData();
-    }
-    
-    autoFillFormWithParsedData(sampleData);
-    showParsingSuccess('smart_fallback');
-}
-
-// Professional data extraction from parsed content
-function extractStructuredData(apiData) {
-    const data = apiData.data || {};
-    
-    return {
-        personal: {
-            name: data.name?.raw || '',
-            email: data.emails?.[0] || '',
-            phone: data.phoneNumbers?.[0] || '',
-            location: data.location?.raw || '',
-            linkedin: data.websites?.find(url => url.includes('linkedin')) || ''
-        },
-        experience: extractExperienceData(data),
-        education: extractEducationData(data),
-        skills: extractSkillsData(data),
-        summary: data.summary || '',
-        fileType: 'premium'
-    };
-}
-
-function extractExperienceData(data) {
-    const experiences = [];
-    (data.workExperiences || []).forEach(exp => {
-        experiences.push({
-            title: exp.jobTitle || '',
-            company: exp.organization || '',
-            start: exp.dates?.startDate || '',
-            end: exp.dates?.endDate || '',
-            description: exp.jobDescription || ''
-        });
-    });
-    return experiences;
-}
-
-function extractEducationData(data) {
-    const education = [];
-    (data.educations || []).forEach(edu => {
-        education.push({
-            degree: edu.accreditation?.education || '',
-            institution: edu.organization || '',
-            year: edu.dates?.completionDate || '',
-            gpa: edu.grade?.value ? `GPA: ${edu.grade.value}` : ''
-        });
-    });
-    return education;
-}
-
-function extractSkillsData(data) {
-    const skills = {
-        technical: (data.skills || []).filter(skill => 
-            isTechnicalSkill(skill.name)
-        ).map(skill => skill.name).join(', '),
-        soft: (data.skills || []).filter(skill => 
-            !isTechnicalSkill(skill.name)
-        ).map(skill => skill.name).join(', '),
-        languages: data.languages?.join(', ') || '',
-        certifications: data.certifications?.join(', ') || ''
-    };
-    return skills;
-}
-
-function isTechnicalSkill(skill) {
-    const techKeywords = ['programming', 'developer', 'engineer', 'software', 'code', 'java', 'python', 'javascript', 'sql', 'aws', 'cloud', 'database', 'framework', 'api'];
-    return techKeywords.some(keyword => skill.toLowerCase().includes(keyword));
-}
-
-// Realistic sample data generators
-function getTechSampleData() {
-    return {
-        personal: {
-            name: "Alex Johnson",
-            email: "alex.johnson@email.com",
-            phone: "+1 (415) 123-4567",
-            location: "San Francisco, CA",
-            linkedin: "https://linkedin.com/in/alexjohnson"
-        },
-        experience: [
-            {
-                title: "Senior Software Engineer",
-                company: "Tech Innovations Inc.",
-                start: "2020-01",
-                end: "2023-12",
-                description: "Led development of microservices architecture serving 1M+ users. Improved system performance by 40% through optimization. Mentored 3 junior developers."
-            }
-        ],
-        education: [
-            {
-                degree: "Bachelor of Science in Computer Science",
-                institution: "Stanford University",
-                year: "2016",
-                gpa: "3.8"
-            }
-        ],
-        skills: {
-            technical: "JavaScript, React, Node.js, Python, AWS, Docker, MongoDB, PostgreSQL, Git, REST APIs",
-            soft: "Team Leadership, Agile Methodology, Problem Solving, Project Management, Communication",
-            languages: "English (Native), Spanish (Intermediate)",
-            certifications: "AWS Certified Solutions Architect, Google Cloud Professional"
-        },
-        summary: "Senior Software Engineer with 7+ years of experience in full-stack development. Specialized in building scalable web applications and leading engineering teams. Proven track record of delivering high-impact projects in fast-paced environments.",
-        fileType: 'smart_detection'
-    };
-}
-
-function getManagementSampleData() {
-    return {
-        personal: {
-            name: "Sarah Chen",
-            email: "sarah.chen@email.com", 
-            phone: "+1 (212) 987-6543",
-            location: "New York, NY",
-            linkedin: "https://linkedin.com/in/sarahchen"
-        },
-        experience: [
-            {
-                title: "Product Manager",
-                company: "Global Solutions Corp.",
-                start: "2019-03", 
-                end: "2023-11",
-                description: "Managed product roadmap for $10M revenue product line. Led cross-functional teams of 15+ members. Increased user engagement by 35% through data-driven feature improvements."
-            }
-        ],
-        education: [
-            {
-                degree: "MBA in Business Administration",
-                institution: "Harvard Business School", 
-                year: "2017",
-                gpa: "3.9"
-            }
-        ],
-        skills: {
-            technical: "Product Strategy, Data Analysis, SQL, JIRA, Confluence, A/B Testing",
-            soft: "Leadership, Stakeholder Management, Strategic Planning, Team Building, Negotiation",
-            languages: "English (Native), Mandarin (Fluent), French (Basic)",
-            certifications: "PMP Certification, Scrum Master Certification"
-        },
-        summary: "Strategic Product Manager with 8+ years of experience driving product vision and execution. Expert in market analysis, user research, and agile product development. Successfully launched 15+ products with proven market success.",
-        fileType: 'smart_detection'
-    };
-}
-
-// Professional UI feedback functions
-function showParsingLoader() {
-    // Replace upload area with loading state
-    const uploadArea = document.querySelector('input[type="file"]').parentElement;
-    uploadArea.innerHTML = `
-        <div class="flex items-center justify-center p-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <span class="ml-4 text-gray-600">AI is analyzing your resume...</span>
-        </div>
-    `;
-}
-
-function showParsingSuccess(fileType) {
-    let message = "Resume parsed successfully!";
-    if (fileType === 'premium') {
-        message = "✅ Professional parsing complete! All data extracted.";
-    } else if (fileType === 'smart_detection') {
-        message = "🤖 AI has intelligently filled your resume template!";
-    }
-    
-    // Show success message
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50';
-    notification.innerHTML = `
-        <div class="flex items-center">
-            <span>${message}</span>
-        </div>
-    `;
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-// Enhanced auto-fill function
-function autoFillFormWithParsedData(parsedData) {
-    // Clear existing dynamic fields
-    clearDynamicFields();
-    
-    // Fill personal information
-    if (parsedData.personal) {
-        document.getElementById('fullName').value = parsedData.personal.name || '';
-        document.getElementById('professionalTitle').value = inferredTitle(parsedData) || '';
-        document.getElementById('personalEmail').value = parsedData.personal.email || '';
-        document.getElementById('phone').value = parsedData.personal.phone || '';
-        document.getElementById('location').value = parsedData.personal.location || '';
-        document.getElementById('linkedin').value = parsedData.personal.linkedin || '';
-    }
-    
-    // Fill professional summary
-    document.getElementById('professionalSummary').value = parsedData.summary || '';
-    
-    // Fill experience
-    if (parsedData.experience && parsedData.experience.length > 0) {
-        parsedData.experience.forEach(exp => {
-            addExperience();
-            const lastExp = document.querySelector('.experience-item:last-child');
-            if (lastExp) {
-                lastExp.querySelector('.exp-title').value = exp.title || '';
-                lastExp.querySelector('.exp-company').value = exp.company || '';
-                lastExp.querySelector('.exp-start').value = exp.start || '';
-                lastExp.querySelector('.exp-end').value = exp.end || '';
-                lastExp.querySelector('.exp-description').value = exp.description || '';
-            }
-        });
-    }
-    
-    // Fill education
-    if (parsedData.education && parsedData.education.length > 0) {
-        parsedData.education.forEach(edu => {
-            addEducation();
-            const lastEdu = document.querySelector('.education-item:last-child');
-            if (lastEdu) {
-                lastEdu.querySelector('.edu-degree').value = edu.degree || '';
-                lastEdu.querySelector('.edu-institution').value = edu.institution || '';
-                lastEdu.querySelector('.edu-year').value = edu.year || '';
-                lastEdu.querySelector('.edu-gpa').value = edu.gpa || '';
-            }
-        });
-    }
-    
-    // Fill skills
-    if (parsedData.skills) {
-        document.getElementById('technicalSkills').value = parsedData.skills.technical || '';
-        document.getElementById('softSkills').value = parsedData.skills.soft || '';
-        document.getElementById('languages').value = parsedData.skills.languages || '';
-        document.getElementById('certifications').value = parsedData.skills.certifications || '';
-    }
-    
-    updateProgress();
-}
-
-function inferredTitle(parsedData) {
-    if (parsedData.experience && parsedData.experience.length > 0) {
-        return parsedData.experience[0].title;
-    }
-    return "Professional";
-}
-
-function clearDynamicFields() {
-    // Clear experience, education, projects
-    document.getElementById('experienceContainer').innerHTML = '';
-    document.getElementById('educationContainer').innerHTML = '';
-    document.getElementById('projectsContainer').innerHTML = '';
-}
-
-// Simulated parsing functions (replace with real implementations)
-async function simulatePDFParsing(file) {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return getTechSampleData();
-}
-
-async function simulateBasicExtraction(file) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return getGenericSampleData();
-}
-
-function getGenericSampleData() {
-    return {
-        personal: {
-            name: "Michael Brown",
-            email: "michael.brown@email.com",
-            phone: "+1 (555) 123-4567", 
-            location: "Chicago, IL",
-            linkedin: "https://linkedin.com/in/michaelbrown"
-        },
-        experience: [
-            {
-                title: "Professional",
-                company: "Various Companies",
-                start: "2018-01",
-                end: "2023-12", 
-                description: "Experienced professional with demonstrated success in relevant field. Skilled in key areas with proven track record of achievement."
-            }
-        ],
-        education: [
-            {
-                degree: "Bachelor's Degree",
-                institution: "State University", 
-                year: "2017",
-                gpa: ""
-            }
-        ],
-        skills: {
-            technical: "Relevant technical skills based on industry",
-            soft: "Communication, Problem Solving, Teamwork, Leadership, Adaptability",
-            languages: "English (Native)",
-            certifications: "Relevant professional certifications"
-        },
-        summary: "Accomplished professional with extensive experience and proven results. Seeking to leverage skills and expertise in new challenging role.",
-        fileType: 'basic_extraction'
-    };
-}
-
-function getCreativeSampleData() {
-    return {
-        personal: {
-            name: "Emily Rodriguez",
-            email: "emily.rodriguez@email.com",
-            phone: "+1 (310) 555-7890", 
-            location: "Los Angeles, CA",
-            linkedin: "https://linkedin.com/in/emilyrodriguez"
-        },
-        experience: [
-            {
-                title: "Senior UX Designer",
-                company: "Creative Digital Agency",
-                start: "2019-06",
-                end: "2023-12",
-                description: "Led UX design for 20+ client projects. Improved user engagement by 45% through data-driven design decisions. Managed design team of 4 designers."
-            }
-        ],
-        education: [
-            {
-                degree: "Bachelor of Fine Arts in Design",
-                institution: "Rhode Island School of Design",
-                year: "2015",
-                gpa: "3.7"
-            }
-        ],
-        skills: {
-            technical: "Figma, Adobe Creative Suite, Sketch, InVision, HTML/CSS, User Research, Wireframing",
-            soft: "Creative Direction, Client Presentation, Team Leadership, User Empathy, Visual Storytelling",
-            languages: "English (Native), Spanish (Fluent)",
-            certifications: "Google UX Design Certificate, Nielsen Norman Group UX Certification"
-        },
-        summary: "Award-winning UX Designer with 8+ years of experience creating intuitive digital experiences. Passionate about user-centered design and creating products that solve real problems. Portfolio available upon request.",
-        fileType: 'smart_detection'
-    };
-}
+        
+        .experience-item, .education-item, .project-item {
+            transition: all 0.3s ease;
+        }
+        
+        .experience-item:hover, .education-item:hover, .project-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</body>
+</html>
