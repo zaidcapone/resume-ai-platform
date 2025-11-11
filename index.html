@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeAI - Smart Resume Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
@@ -13,9 +16,29 @@
             <p class="text-xl text-gray-600">AI-powered resume optimization</p>
         </header>
 
-        <div class="bg-white rounded-xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome to ResumeAI</h2>
-            <p class="text-gray-600 mb-6">Upload your resume and get AI-powered insights to land your dream job.</p>
+        <!-- Login/Signup Form -->
+        <div id="authSection" class="bg-white rounded-xl shadow-lg p-8 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Get Started</h2>
+            
+            <div class="space-y-4">
+                <input type="email" id="email" placeholder="Your email" class="w-full p-3 border border-gray-300 rounded-lg">
+                <input type="password" id="password" placeholder="Your password" class="w-full p-3 border border-gray-300 rounded-lg">
+                
+                <button onclick="signUp()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                    Create Account
+                </button>
+                <button onclick="login()" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition">
+                    Login
+                </button>
+            </div>
+        </div>
+
+        <!-- Main App (hidden until login) -->
+        <div id="appSection" class="hidden bg-white rounded-xl shadow-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Welcome, <span id="userEmail">User</span>!</h2>
+                <button onclick="logout()" class="text-red-600 hover:text-red-800">Logout</button>
+            </div>
             
             <div class="space-y-4">
                 <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
@@ -27,5 +50,74 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Your Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_Si4j_KI1ufVg0_tthDFZjkrnYs-XNtE",
+            authDomain: "resume-ai-platform.firebaseapp.com",
+            projectId: "resume-ai-platform",
+            storageBucket: "resume-ai-platform.firebasestorage.app",
+            messagingSenderId: "246570862355",
+            appId: "1:246570862355:web:4f4e2e3e3fdf366d95bce6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Auth functions
+        function signUp() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert('Account created successfully!');
+                    showApp();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showApp();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        }
+
+        function logout() {
+            firebase.auth().signOut();
+            showAuth();
+        }
+
+        function showApp() {
+            const user = firebase.auth().currentUser;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+        }
+
+        function showAuth() {
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('appSection').classList.add('hidden');
+        }
+
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                showApp();
+            } else {
+                showAuth();
+            }
+        });
+    </script>
 </body>
 </html>
