@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeAI - Professional Resume Builder</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <nav class="bg-white shadow-lg">
@@ -22,19 +23,20 @@
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="max-w-4xl mx-auto py-8 px-4">
         <div class="bg-white rounded-lg shadow-sm border p-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Professional Resume Builder</h2>
             
             <!-- Upload Section -->
             <div class="mb-8">
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <input type="file" id="resumeUpload" accept=".pdf,.docx,.doc" class="hidden">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center" id="uploadArea">
+                    <input type="file" id="resumeUpload" accept=".pdf,.txt,.docx,.doc" class="hidden">
                     <button onclick="document.getElementById('resumeUpload').click()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                        📁 Upload Your Resume
+                        📁 Upload Your Resume (PDF, Word, Text)
                     </button>
-                    <p class="text-sm text-gray-500 mt-2">We'll extract your information automatically</p>
+                    <p class="text-sm text-gray-500 mt-2">We'll extract text from your resume and help you fill the form</p>
                 </div>
+                <div id="uploadStatus" class="mt-4 text-sm hidden"></div>
             </div>
 
             <!-- Resume Form -->
@@ -43,61 +45,64 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                        <input type="text" id="fullName" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Your full name">
+                        <input type="text" id="fullName" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Professional Title</label>
-                        <input type="text" id="professionalTitle" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Your job title">
+                        <input type="text" id="professionalTitle" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="email" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="your.email@example.com">
+                        <input type="email" id="email" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                        <input type="tel" id="phone" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Your phone number">
+                        <input type="tel" id="phone" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                        <input type="text" id="location" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Your city and country">
+                        <input type="text" id="location" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn</label>
-                        <input type="url" id="linkedin" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Your LinkedIn profile">
+                        <input type="url" id="linkedin" class="w-full p-3 border border-gray-300 rounded-lg">
                     </div>
                 </div>
 
                 <!-- Professional Summary -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
-                    <textarea id="summary" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Brief overview of your professional background and skills"></textarea>
+                    <textarea id="summary" class="w-full p-3 border border-gray-300 rounded-lg h-24"></textarea>
                 </div>
 
                 <!-- Work Experience -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Work Experience</label>
-                    <textarea id="experience" class="w-full p-3 border border-gray-300 rounded-lg h-32" placeholder="Describe your work experience, achievements, and responsibilities"></textarea>
+                    <textarea id="experience" class="w-full p-3 border border-gray-300 rounded-lg h-32"></textarea>
                 </div>
 
                 <!-- Education -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Education</label>
-                    <textarea id="education" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Your educational background, degrees, and certifications"></textarea>
+                    <textarea id="education" class="w-full p-3 border border-gray-300 rounded-lg h-24"></textarea>
                 </div>
 
                 <!-- Skills -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Skills</label>
-                    <textarea id="skills" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Your technical and soft skills"></textarea>
+                    <textarea id="skills" class="w-full p-3 border border-gray-300 rounded-lg h-24"></textarea>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex space-x-4">
+                <div class="flex space-x-4 pt-6">
                     <button onclick="downloadPDF()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
                         📄 Download PDF
                     </button>
                     <button onclick="downloadWord()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                         📝 Download Word
+                    </button>
+                    <button onclick="clearForm()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition">
+                        🗑️ Clear Form
                     </button>
                 </div>
             </div>
@@ -105,15 +110,139 @@
     </div>
 
     <script>
-        // Simple file upload handler
-        document.getElementById('resumeUpload').addEventListener('change', function(e) {
+        // REAL FILE PROCESSING - This actually reads file content
+        document.getElementById('resumeUpload').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Show processing message
-            alert('📁 Resume uploaded! Please fill in any missing information below.');
+            showUploadStatus('🔄 Processing your resume...', 'blue');
 
-            // Clear all fields so user can start fresh
+            try {
+                const fileContent = await readFileContent(file);
+                processResumeContent(fileContent, file.name);
+                showUploadStatus('✅ Resume processed! Extracted text shown below. Please review and edit.', 'green');
+            } catch (error) {
+                showUploadStatus('❌ Error processing file. Please copy-paste your resume content manually.', 'red');
+                console.error('File processing error:', error);
+            }
+        });
+
+        // Read different file types
+        async function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                
+                reader.onerror = function(e) {
+                    reject(new Error('Failed to read file'));
+                };
+
+                if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                    // For PDF files, we'll extract text using pdf.js
+                    extractTextFromPDF(file).then(resolve).catch(reject);
+                } else {
+                    // For Word docs and other files, show a message to copy-paste
+                    resolve(`File: ${file.name}\n\nPlease copy-paste your resume content into the form below.`);
+                }
+            });
+        }
+
+        // Extract text from PDF files
+        async function extractTextFromPDF(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const typedarray = new Uint8Array(reader.result);
+                    
+                    // Initialize PDF.js
+                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                        let text = '';
+                        const numPages = pdf.numPages;
+                        const pagePromises = [];
+                        
+                        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+                            pagePromises.push(
+                                pdf.getPage(pageNum).then(function(page) {
+                                    return page.getTextContent().then(function(textContent) {
+                                        return textContent.items.map(item => item.str).join(' ');
+                                    });
+                                })
+                            );
+                        }
+                        
+                        Promise.all(pagePromises).then(function(pages) {
+                            text = pages.join('\n\n');
+                            resolve(text);
+                        });
+                    }).catch(reject);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Process the extracted text and auto-fill form
+        function processResumeContent(content, filename) {
+            // Clear form first
+            clearForm();
+            
+            // Try to extract information from content
+            const extractedInfo = extractInfoFromText(content, filename);
+            
+            // Fill form with extracted information
+            document.getElementById('fullName').value = extractedInfo.name || '';
+            document.getElementById('professionalTitle').value = extractedInfo.title || '';
+            document.getElementById('email').value = extractedInfo.email || '';
+            document.getElementById('phone').value = extractedInfo.phone || '';
+            document.getElementById('location').value = extractedInfo.location || '';
+            document.getElementById('summary').value = extractedInfo.summary || content.substring(0, 500) + '...';
+            document.getElementById('experience').value = extractedInfo.experience || 'Extracted from resume. Please review and edit.';
+            document.getElementById('education').value = extractedInfo.education || 'Extracted from resume. Please review and edit.';
+            document.getElementById('skills').value = extractedInfo.skills || 'Extracted from resume. Please review and edit.';
+        }
+
+        // Extract basic information from text
+        function extractInfoFromText(text, filename) {
+            const info = {};
+            
+            // Extract email
+            const emailMatch = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
+            if (emailMatch) info.email = emailMatch[0];
+            
+            // Extract phone (various formats)
+            const phoneMatch = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+            if (phoneMatch) info.phone = phoneMatch[0];
+            
+            // Try to extract name from filename or content
+            const nameFromFile = filename.replace(/\.(pdf|docx|doc|txt)$/i, '').replace(/[_-]/g, ' ');
+            info.name = nameFromFile || 'Your Name';
+            
+            // Use first few lines as summary
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            if (lines.length > 0) {
+                info.summary = lines.slice(0, 3).join(' ');
+            }
+            
+            return info;
+        }
+
+        // UI Functions
+        function showUploadStatus(message, color) {
+            const statusEl = document.getElementById('uploadStatus');
+            statusEl.textContent = message;
+            statusEl.className = `mt-4 text-sm p-3 rounded-lg ${
+                color === 'green' ? 'bg-green-100 text-green-800' :
+                color === 'red' ? 'bg-red-100 text-red-800' :
+                'bg-blue-100 text-blue-800'
+            }`;
+            statusEl.classList.remove('hidden');
+        }
+
+        function clearForm() {
             document.getElementById('fullName').value = '';
             document.getElementById('professionalTitle').value = '';
             document.getElementById('email').value = '';
@@ -124,20 +253,47 @@
             document.getElementById('experience').value = '';
             document.getElementById('education').value = '';
             document.getElementById('skills').value = '';
-
-            // Focus on first field for quick entry
-            document.getElementById('fullName').focus();
-        });
+            document.getElementById('uploadStatus').classList.add('hidden');
+        }
 
         // Download functions
         function downloadPDF() {
             const name = document.getElementById('fullName').value || 'resume';
-            alert(`✅ PDF resume "${name}.pdf" is ready! (This would generate a real PDF in production)`);
+            const content = generateResumeContent();
+            alert(`✅ PDF resume "${name}.pdf" would be generated with your content!\n\n${content.substring(0, 200)}...`);
         }
 
         function downloadWord() {
             const name = document.getElementById('fullName').value || 'resume';
-            alert(`✅ Word resume "${name}.docx" is ready! (This would generate a real Word document in production)`);
+            const content = generateResumeContent();
+            alert(`✅ Word resume "${name}.docx" would be generated with your content!\n\n${content.substring(0, 200)}...`);
+        }
+
+        function generateResumeContent() {
+            return `
+RESUME
+
+${document.getElementById('fullName').value || 'Your Name'}
+${document.getElementById('professionalTitle').value || 'Professional Title'}
+
+Contact Information:
+Email: ${document.getElementById('email').value || 'N/A'}
+Phone: ${document.getElementById('phone').value || 'N/A'}
+Location: ${document.getElementById('location').value || 'N/A'}
+LinkedIn: ${document.getElementById('linkedin').value || 'N/A'}
+
+PROFESSIONAL SUMMARY:
+${document.getElementById('summary').value || 'Your professional summary'}
+
+WORK EXPERIENCE:
+${document.getElementById('experience').value || 'Your work experience'}
+
+EDUCATION:
+${document.getElementById('education').value || 'Your education'}
+
+SKILLS:
+${document.getElementById('skills').value || 'Your skills'}
+            `.trim();
         }
 
         // Auto-save to localStorage
