@@ -5,54 +5,342 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeAI - Smart Resume Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Add Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">ResumeAI</h1>
-            <p class="text-xl text-gray-600">AI-powered resume optimization</p>
-        </header>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg mr-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">ResumeAI</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="logoutBtn" class="text-gray-600 hover:text-gray-800 hidden">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Login/Signup Form -->
-        <div id="authSection" class="bg-white rounded-xl shadow-lg p-8 mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Get Started</h2>
-            
-            <div class="space-y-4">
-                <input type="email" id="email" placeholder="Your email" class="w-full p-3 border border-gray-300 rounded-lg">
-                <input type="password" id="password" placeholder="Your password" class="w-full p-3 border border-gray-300 rounded-lg">
-                
-                <button onclick="signUp()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
-                    Create Account
-                </button>
-                <button onclick="login()" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition">
-                    Login
-                </button>
+    <!-- Auth Section -->
+    <div id="authSection" class="max-w-md mx-auto mt-16 bg-white rounded-xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome to ResumeAI</h2>
+        <div class="space-y-4">
+            <input type="email" id="email" placeholder="Your email" class="w-full p-3 border border-gray-300 rounded-lg">
+            <input type="password" id="password" placeholder="Your password" class="w-full p-3 border border-gray-300 rounded-lg">
+            <button onclick="signUp()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                Create Account
+            </button>
+            <button onclick="login()" class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition">
+                Login
+            </button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appSection" class="hidden">
+        <!-- Tabs Navigation -->
+        <div class="bg-white border-b">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex space-x-8">
+                    <button class="tab-button py-4 px-2 border-b-2 border-blue-600 font-medium text-blue-600" data-tab="builder">
+                        📝 Resume Builder
+                    </button>
+                    <button class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700" data-tab="review">
+                        🤖 AI Review
+                    </button>
+                    <button class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700" data-tab="customizer">
+                        🎯 Job Customizer
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Main App (hidden until login) -->
-        <div id="appSection" class="hidden bg-white rounded-xl shadow-lg p-8">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Welcome, <span id="userEmail">User</span>!</h2>
-                <button onclick="logout()" class="text-red-600 hover:text-red-800">Logout</button>
-            </div>
+        <!-- Tab Contents -->
+        <div class="max-w-7xl mx-auto py-8 px-4">
             
-            <div class="space-y-4">
-                <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
-                    Upload Resume
-                </button>
-                <button class="w-full border border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition">
-                    Analyze Job Match
-                </button>
+            <!-- TAB 1: Resume Builder -->
+            <div id="builder" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    <!-- Left Side - Progress & Upload -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Upload Card -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <h3 class="font-semibold text-gray-800 mb-4">Quick Start</h3>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-4">
+                                <input type="file" id="resumeUpload" accept=".pdf,.docx,.doc" class="hidden">
+                                <button onclick="document.getElementById('resumeUpload').click()" class="text-blue-600 hover:text-blue-800">
+                                    📁 Upload Existing Resume
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2">AI will auto-fill the form</p>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="font-semibold" id="progressPercent">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Actions -->
+                        <div class="bg-white rounded-lg shadow-sm border p-6">
+                            <button onclick="saveResume()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition mb-3">
+                                💾 Save Resume
+                            </button>
+                            <button onclick="loadSavedResume()" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition">
+                                📂 Load Saved
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Form -->
+                    <div class="lg:col-span-3">
+                        <div class="bg-white rounded-lg shadow-sm border">
+                            <!-- Personal Information -->
+                            <div class="section-group border-b p-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">👤 Personal Information</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                        <input type="text" id="fullName" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="John Doe">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Professional Title *</label>
+                                        <input type="text" id="professionalTitle" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Senior Software Engineer">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                        <input type="email" id="personalEmail" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="john@example.com">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                                        <input type="tel" id="phone" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="+1 (555) 123-4567">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                        <input type="text" id="location" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="City, Country">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn</label>
+                                        <input type="url" id="linkedin" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="https://linkedin.com/in/username">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
+                                        <textarea id="professionalSummary" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Experienced professional with expertise in..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Work Experience -->
+                            <div class="section-group border-b p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">💼 Work Experience</h3>
+                                    <button onclick="addExperience()" class="text-blue-600 hover:text-blue-800 text-sm">+ Add Experience</button>
+                                </div>
+                                <div id="experienceContainer">
+                                    <!-- Dynamic experience fields will be added here -->
+                                </div>
+                            </div>
+
+                            <!-- Education -->
+                            <div class="section-group border-b p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">🎓 Education</h3>
+                                    <button onclick="addEducation()" class="text-blue-600 hover:text-blue-800 text-sm">+ Add Education</button>
+                                </div>
+                                <div id="educationContainer">
+                                    <!-- Dynamic education fields will be added here -->
+                                </div>
+                            </div>
+
+                            <!-- Skills -->
+                            <div class="section-group border-b p-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">🛠️ Skills & Competencies</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Technical Skills</label>
+                                        <textarea id="technicalSkills" class="w-full p-3 border border-gray-300 rounded-lg h-32" placeholder="JavaScript, Python, React, Node.js..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Soft Skills</label>
+                                        <textarea id="softSkills" class="w-full p-3 border border-gray-300 rounded-lg h-32" placeholder="Leadership, Communication, Project Management..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+                                        <textarea id="languages" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="English (Native), Spanish (Intermediate)..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Certifications</label>
+                                        <textarea id="certifications" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="AWS Certified, PMP, Google Analytics..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Projects -->
+                            <div class="section-group border-b p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">🚀 Projects</h3>
+                                    <button onclick="addProject()" class="text-blue-600 hover:text-blue-800 text-sm">+ Add Project</button>
+                                </div>
+                                <div id="projectsContainer">
+                                    <!-- Dynamic project fields will be added here -->
+                                </div>
+                            </div>
+
+                            <!-- Additional Sections -->
+                            <div class="section-group p-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">📚 Additional Information</h3>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Volunteer Experience</label>
+                                        <textarea id="volunteer" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Volunteer roles and contributions..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Publications & Research</label>
+                                        <textarea id="publications" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Papers, articles, research projects..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Awards & Honors</label>
+                                        <textarea id="awards" class="w-full p-3 border border-gray-300 rounded-lg h-24" placeholder="Recognition and achievements..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AI Review -->
+            <div id="review" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🤖 AI Resume Review</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Analysis Results -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                                <h3 class="font-semibold text-gray-800 mb-4">Overall Score</h3>
+                                <div class="text-center">
+                                    <div class="radial-progress bg-blue-100 text-blue-600 border-4 border-white mx-auto" style="--value:0; --size:8rem; --thickness: 12px;">0%</div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="bg-white border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-800 mb-2">ATS Optimization</h4>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-2" id="atsFeedback">Upload your resume to get analysis</p>
+                                </div>
+
+                                <div class="bg-white border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-800 mb-2">Content Quality</h4>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-2" id="contentFeedback">We'll analyze your resume content</p>
+                                </div>
+
+                                <div class="bg-white border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-800 mb-2">Keyword Optimization</h4>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-red-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-2" id="keywordFeedback">Missing important industry keywords</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-blue-50 rounded-lg p-6">
+                                <h3 class="font-semibold text-gray-800 mb-4">AI Recommendations</h3>
+                                <div id="aiRecommendations" class="space-y-3">
+                                    <p class="text-sm text-gray-600">Complete your resume to get personalized AI recommendations for improvement.</p>
+                                </div>
+                                <button onclick="analyzeResume()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition mt-6">
+                                    🔍 Analyze My Resume
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Job Customizer -->
+            <div id="customizer" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow-sm border p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🎯 Smart Resume Customizer</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Job Description Input -->
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-4">Paste Job Description</h3>
+                            <textarea id="jobDescription" class="w-full h-64 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Paste the complete job description here..."></textarea>
+                            <button onclick="analyzeJobMatch()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition mt-4">
+                                🎯 Analyze Job Match
+                            </button>
+                        </div>
+
+                        <!-- Customized Resume & Download -->
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-4">Customized Resume</h3>
+                            <div class="bg-gray-50 rounded-lg p-6 h-64 overflow-y-auto mb-4">
+                                <div id="customizedResumePreview">
+                                    <p class="text-gray-600">Your customized resume will appear here after analysis.</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="downloadPDF()" class="bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition">
+                                    📄 Download PDF
+                                </button>
+                                <button onclick="downloadWord()" class="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                                    📝 Download Word
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Results -->
+                    <div id="matchResults" class="hidden mt-8 bg-blue-50 rounded-lg p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Job Match Analysis</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600" id="overallMatch">0%</div>
+                                <div class="text-sm text-gray-600">Overall Match</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600" id="skillsMatch">0%</div>
+                                <div class="text-sm text-gray-600">Skills Match</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-600" id="experienceMatch">0%</div>
+                                <div class="text-sm text-gray-600">Experience Match</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-600" id="keywordMatch">0%</div>
+                                <div class="text-sm text-gray-600">Keyword Match</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Your Firebase Config
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA_Si4j_KI1ufVg0_tthDFZjkrnYs-XNtE",
             authDomain: "resume-ai-platform.firebaseapp.com",
@@ -64,16 +352,22 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        // Auth functions
+        // Current user data
+        let currentUser = null;
+        let userResume = {};
+
+        // Authentication functions
         function signUp() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert('Account created successfully!');
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
                     showApp();
+                    initializeResume();
                 })
                 .catch(error => {
                     alert('Error: ' + error.message);
@@ -85,8 +379,10 @@
             const password = document.getElementById('password').value;
             
             firebase.auth().signInWithEmailAndPassword(email, password)
-                .then(() => {
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
                     showApp();
+                    loadUserResume();
                 })
                 .catch(error => {
                     alert('Error: ' + error.message);
@@ -99,25 +395,446 @@
         }
 
         function showApp() {
-            const user = firebase.auth().currentUser;
-            document.getElementById('userEmail').textContent = user.email;
             document.getElementById('authSection').classList.add('hidden');
             document.getElementById('appSection').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
         }
 
         function showAuth() {
             document.getElementById('authSection').classList.remove('hidden');
             document.getElementById('appSection').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
         }
 
-        // Check if user is already logged in
+        // Tab management
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active tab button
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('border-blue-600', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                this.classList.add('border-blue-600', 'text-blue-600');
+                this.classList.remove('border-transparent', 'text-gray-500');
+
+                // Show active tab content
+                const tabId = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+
+        // Initialize default experience field
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const expId = 'exp_' + Date.now();
+            const expHtml = `
+                <div class="experience-item border rounded-lg p-4 mb-4" data-id="${expId}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg exp-title" placeholder="Senior Developer">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
+                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg exp-company" placeholder="Tech Company Inc.">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                            <input type="month" class="w-full p-2 border border-gray-300 rounded-lg exp-start">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                            <input type="month" class="w-full p-2 border border-gray-300 rounded-lg exp-end" placeholder="Present">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Responsibilities & Achievements</label>
+                        <textarea class="w-full p-2 border border-gray-300 rounded-lg h-20 exp-description" placeholder="• Led team of 5 developers...&#10;• Improved system performance by 40%..."></textarea>
+                    </div>
+                    <button onclick="removeExperience('${expId}')" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', expHtml);
+            updateProgress();
+        }
+
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const eduId = 'edu_' + Date.now();
+            const eduHtml = `
+                <div class="education-item border rounded-lg p-4 mb-4" data-id="${eduId}">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Degree *</label>
+                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg edu-degree" placeholder="Bachelor of Science">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Institution *</label>
+                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg edu-institution" placeholder="University Name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Graduation Year</label>
+                            <input type="number" class="w-full p-2 border border-gray-300 rounded-lg edu-year" placeholder="2020">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">GPA (Optional)</label>
+                            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg edu-gpa" placeholder="3.8">
+                        </div>
+                    </div>
+                    <button onclick="removeEducation('${eduId}')" class="text-red-600 hover:text-red-800 text-sm mt-2">Remove</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', eduHtml);
+            updateProgress();
+        }
+
+        function addProject() {
+            const container = document.getElementById('projectsContainer');
+            const projId = 'proj_' + Date.now();
+            const projHtml = `
+                <div class="project-item border rounded-lg p-4 mb-4" data-id="${projId}">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project Name *</label>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-lg proj-name" placeholder="E-commerce Platform">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea class="w-full p-2 border border-gray-300 rounded-lg h-20 proj-description" placeholder="Developed a full-stack e-commerce solution..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Technologies Used</label>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-lg proj-tech" placeholder="React, Node.js, MongoDB">
+                    </div>
+                    <button onclick="removeProject('${projId}')" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', projHtml);
+            updateProgress();
+        }
+
+        function removeExperience(id) {
+            document.querySelector(`[data-id="${id}"]`).remove();
+            updateProgress();
+        }
+
+        function removeEducation(id) {
+            document.querySelector(`[data-id="${id}"]`).remove();
+            updateProgress();
+        }
+
+        function removeProject(id) {
+            document.querySelector(`[data-id="${id}"]`).remove();
+            updateProgress();
+        }
+
+        // Progress tracking
+        function updateProgress() {
+            let filledFields = 0;
+            let totalFields = 0;
+
+            // Personal info fields
+            const personalFields = ['fullName', 'professionalTitle', 'personalEmail', 'phone'];
+            personalFields.forEach(field => {
+                totalFields++;
+                if (document.getElementById(field) && document.getElementById(field).value.trim()) filledFields++;
+            });
+
+            // Experience fields
+            const expItems = document.querySelectorAll('.experience-item');
+            totalFields += expItems.length;
+            filledFields += expItems.length;
+
+            // Education fields  
+            const eduItems = document.querySelectorAll('.education-item');
+            totalFields += eduItems.length;
+            filledFields += eduItems.length;
+
+            // Text areas
+            const textAreas = ['professionalSummary', 'technicalSkills', 'softSkills'];
+            textAreas.forEach(area => {
+                totalFields++;
+                if (document.getElementById(area) && document.getElementById(area).value.trim()) filledFields++;
+            });
+
+            const progress = totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+            document.getElementById('progressPercent').textContent = progress + '%';
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update radial progress in AI review
+            document.querySelector('.radial-progress').style.setProperty('--value', progress);
+            document.querySelector('.radial-progress').textContent = progress + '%';
+        }
+
+        // Save resume to Firebase
+        function saveResume() {
+            if (!currentUser) return;
+
+            const resumeData = {
+                personal: {
+                    fullName: document.getElementById('fullName').value,
+                    professionalTitle: document.getElementById('professionalTitle').value,
+                    email: document.getElementById('personalEmail').value,
+                    phone: document.getElementById('phone').value,
+                    location: document.getElementById('location').value,
+                    linkedin: document.getElementById('linkedin').value,
+                    summary: document.getElementById('professionalSummary').value
+                },
+                experience: getExperienceData(),
+                education: getEducationData(),
+                skills: {
+                    technical: document.getElementById('technicalSkills').value,
+                    soft: document.getElementById('softSkills').value,
+                    languages: document.getElementById('languages').value,
+                    certifications: document.getElementById('certifications').value
+                },
+                projects: getProjectsData(),
+                additional: {
+                    volunteer: document.getElementById('volunteer').value,
+                    publications: document.getElementById('publications').value,
+                    awards: document.getElementById('awards').value
+                },
+                lastUpdated: new Date()
+            };
+
+            db.collection('resumes').doc(currentUser.uid).set(resumeData)
+                .then(() => {
+                    alert('Resume saved successfully!');
+                })
+                .catch(error => {
+                    alert('Error saving resume: ' + error.message);
+                });
+        }
+
+        function getExperienceData() {
+            const experiences = [];
+            document.querySelectorAll('.experience-item').forEach(item => {
+                experiences.push({
+                    title: item.querySelector('.exp-title').value,
+                    company: item.querySelector('.exp-company').value,
+                    start: item.querySelector('.exp-start').value,
+                    end: item.querySelector('.exp-end').value,
+                    description: item.querySelector('.exp-description').value
+                });
+            });
+            return experiences;
+        }
+
+        function getEducationData() {
+            const education = [];
+            document.querySelectorAll('.education-item').forEach(item => {
+                education.push({
+                    degree: item.querySelector('.edu-degree').value,
+                    institution: item.querySelector('.edu-institution').value,
+                    year: item.querySelector('.edu-year').value,
+                    gpa: item.querySelector('.edu-gpa').value
+                });
+            });
+            return education;
+        }
+
+        function getProjectsData() {
+            const projects = [];
+            document.querySelectorAll('.project-item').forEach(item => {
+                projects.push({
+                    name: item.querySelector('.proj-name').value,
+                    description: item.querySelector('.proj-description').value,
+                    technologies: item.querySelector('.proj-tech').value
+                });
+            });
+            return projects;
+        }
+
+        // Load saved resume
+        function loadUserResume() {
+            if (!currentUser) return;
+
+            db.collection('resumes').doc(currentUser.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        loadSavedResume(doc.data());
+                    } else {
+                        initializeResume();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading resume:', error);
+                    initializeResume();
+                });
+        }
+
+        function loadSavedResume(resumeData = null) {
+            if (!resumeData) {
+                // Load from Firebase or initialize empty
+                initializeResume();
+                return;
+            }
+
+            // Load personal info
+            if (resumeData.personal) {
+                document.getElementById('fullName').value = resumeData.personal.fullName || '';
+                document.getElementById('professionalTitle').value = resumeData.personal.professionalTitle || '';
+                document.getElementById('personalEmail').value = resumeData.personal.email || '';
+                document.getElementById('phone').value = resumeData.personal.phone || '';
+                document.getElementById('location').value = resumeData.personal.location || '';
+                document.getElementById('linkedin').value = resumeData.personal.linkedin || '';
+                document.getElementById('professionalSummary').value = resumeData.personal.summary || '';
+            }
+
+            // Load experience
+            if (resumeData.experience) {
+                resumeData.experience.forEach(exp => {
+                    addExperience();
+                    const lastExp = document.querySelector('.experience-item:last-child');
+                    lastExp.querySelector('.exp-title').value = exp.title || '';
+                    lastExp.querySelector('.exp-company').value = exp.company || '';
+                    lastExp.querySelector('.exp-start').value = exp.start || '';
+                    lastExp.querySelector('.exp-end').value = exp.end || '';
+                    lastExp.querySelector('.exp-description').value = exp.description || '';
+                });
+            }
+
+            // Load education
+            if (resumeData.education) {
+                resumeData.education.forEach(edu => {
+                    addEducation();
+                    const lastEdu = document.querySelector('.education-item:last-child');
+                    lastEdu.querySelector('.edu-degree').value = edu.degree || '';
+                    lastEdu.querySelector('.edu-institution').value = edu.institution || '';
+                    lastEdu.querySelector('.edu-year').value = edu.year || '';
+                    lastEdu.querySelector('.edu-gpa').value = edu.gpa || '';
+                });
+            }
+
+            // Load skills
+            if (resumeData.skills) {
+                document.getElementById('technicalSkills').value = resumeData.skills.technical || '';
+                document.getElementById('softSkills').value = resumeData.skills.soft || '';
+                document.getElementById('languages').value = resumeData.skills.languages || '';
+                document.getElementById('certifications').value = resumeData.skills.certifications || '';
+            }
+
+            // Load projects
+            if (resumeData.projects) {
+                resumeData.projects.forEach(proj => {
+                    addProject();
+                    const lastProj = document.querySelector('.project-item:last-child');
+                    lastProj.querySelector('.proj-name').value = proj.name || '';
+                    lastProj.querySelector('.proj-description').value = proj.description || '';
+                    lastProj.querySelector('.proj-tech').value = proj.technologies || '';
+                });
+            }
+
+            // Load additional info
+            if (resumeData.additional) {
+                document.getElementById('volunteer').value = resumeData.additional.volunteer || '';
+                document.getElementById('publications').value = resumeData.additional.publications || '';
+                document.getElementById('awards').value = resumeData.additional.awards || '';
+            }
+
+            updateProgress();
+        }
+
+        function initializeResume() {
+            // Add one empty experience and education field by default
+            addExperience();
+            addEducation();
+            updateProgress();
+        }
+
+        // AI Analysis functions (placeholder - will integrate with actual AI)
+        function analyzeResume() {
+            alert('AI analysis feature will be integrated with OpenAI API');
+            // Simulate analysis
+            document.querySelector('.radial-progress').style.setProperty('--value', 75);
+            document.querySelector('.radial-progress').textContent = '75%';
+        }
+
+        function analyzeJobMatch() {
+            const jobDesc = document.getElementById('jobDescription').value;
+            if (!jobDesc) {
+                alert('Please paste a job description first');
+                return;
+            }
+
+            // Simulate AI analysis
+            document.getElementById('overallMatch').textContent = '78%';
+            document.getElementById('skillsMatch').textContent = '85%';
+            document.getElementById('experienceMatch').textContent = '72%';
+            document.getElementById('keywordMatch').textContent = '81%';
+            document.getElementById('matchResults').classList.remove('hidden');
+
+            // Show customized resume preview
+            document.getElementById('customizedResumePreview').innerHTML = `
+                <h4 class="font-semibold text-gray-800 mb-2">Customized Resume Preview</h4>
+                <p class="text-sm text-gray-600 mb-2">Your resume has been optimized for this specific job description.</p>
+                <ul class="text-sm text-gray-700 list-disc list-inside">
+                    <li>Added relevant keywords from job description</li>
+                    <li>Highlighted matching skills and experience</li>
+                    <li>Optimized professional summary</li>
+                    <li>Enhanced achievement bullet points</li>
+                </ul>
+            `;
+        }
+
+        // Download functions (placeholder)
+        function downloadPDF() {
+            alert('PDF download feature will be integrated with jsPDF');
+        }
+
+        function downloadWord() {
+            alert('Word download feature will be integrated with docx.js');
+        }
+
+        // File upload handler
+        document.getElementById('resumeUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                alert('Resume uploaded! AI parsing will be integrated with resume parsing API');
+                // Simulate AI auto-fill
+                document.getElementById('fullName').value = "John Doe";
+                document.getElementById('professionalTitle').value = "Senior Software Engineer";
+                updateProgress();
+            }
+        });
+
+        // Initialize progress tracking on input changes
+        document.addEventListener('input', updateProgress);
+
+        // Check auth state on load
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
+                currentUser = user;
                 showApp();
+                loadUserResume();
             } else {
                 showAuth();
             }
         });
+
+        // Add event listener for logout button
+        document.getElementById('logoutBtn').addEventListener('click', logout);
     </script>
+
+    <style>
+        .radial-progress {
+            background: radial-gradient(closest-side, white 79%, transparent 80% 100%),
+            conic-gradient(currentColor calc(var(--value)*1%), #e5e7eb 0);
+        }
+        
+        .section-group {
+            transition: all 0.3s ease;
+        }
+        
+        .experience-item, .education-item, .project-item {
+            transition: all 0.3s ease;
+        }
+        
+        .experience-item:hover, .education-item:hover, .project-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
 </body>
 </html>
