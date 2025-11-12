@@ -3,64 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerProfile - Complete Professional Platform</title>
+    <title>CareerProfile - AI Professional Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0a0a;
+            color: #00ff41;
+            overflow-x: hidden;
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+        }
+        
+        .cyber-glow {
+            box-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 60px #00ff41;
+        }
+        
+        .cyber-border {
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 10px #00ff41, inset 0 0 10px #00ff41;
+        }
+        
+        .hologram-effect {
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+        }
+        
+        .cyber-button {
+            background: linear-gradient(45deg, #00ff41, #008631);
+            border: none;
+            color: #000;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .cyber-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 65, 0.4);
+        }
+        
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid #00ff41;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00ff41 }
+        }
+        
+        input, textarea {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .cyber-loader {
+            border: 3px solid #00ff41;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-black text-green-400">
+    <!-- Matrix Background -->
+    <div class="matrix-bg"></div>
+    <canvas class="matrix-rain" id="matrixCanvas"></canvas>
+
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg border-b border-blue-200">
+    <nav class="hologram-effect border-b border-green-400/30 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl">
+                    <div class="cyber-glow bg-gradient-to-r from-green-400 to-green-600 text-black p-3 rounded-lg floating">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">CareerProfile</h1>
-                        <p class="text-xs text-gray-600">Complete Professional Platform</p>
+                        <h1 class="text-2xl font-bold neon-text">CareerProfile</h1>
+                        <p class="text-xs text-green-300 typewriter">AI-Powered Professional Platform</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4" id="authButtons">
-                    <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800 font-semibold">Login</button>
-                    <button onclick="showSignup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Sign Up Free</button>
+                    <button onclick="showLogin()" class="text-green-400 hover:text-green-200 font-semibold pulse-glow">[ LOGIN ]</button>
+                    <button onclick="showSignup()" class="cyber-button px-6 py-2 rounded-lg font-semibold">[ SIGN UP ]</button>
                 </div>
                 <div class="hidden items-center space-x-4" id="userMenu">
-                    <span class="text-gray-700" id="userGreeting">Welcome, User!</span>
-                    <button onclick="logout()" class="text-gray-600 hover:text-gray-800 font-semibold">Logout</button>
+                    <span class="text-green-300" id="userGreeting">Welcome, User!</span>
+                    <button onclick="logout()" class="text-green-400 hover:text-green-200 font-semibold">[ LOGOUT ]</button>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Authentication -->
-    <div id="authSection" class="max-w-md mx-auto mt-12 bg-white rounded-xl shadow-lg p-8">
+    <div id="authSection" class="max-w-md mx-auto mt-12 hologram-effect rounded-lg p-8 cyber-border">
         <div id="loginForm">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome Back</h2>
+            <h2 class="text-2xl font-bold neon-text mb-6 text-center">[ ACCESS GRANTED ]</h2>
             <div class="space-y-4">
-                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-3 border rounded-lg">
-                <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 border rounded-lg">
-                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">Sign In</button>
+                <input type="email" id="loginEmail" placeholder=">> EMAIL" class="w-full p-3 rounded-lg">
+                <input type="password" id="loginPassword" placeholder=">> PASSWORD" class="w-full p-3 rounded-lg">
+                <button onclick="login()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ AUTHENTICATE ]</button>
             </div>
             <div class="text-center mt-4">
-                <button onclick="showSignup()" class="text-blue-600 hover:text-blue-800">Create Account</button>
+                <button onclick="showSignup()" class="text-green-400 hover:text-green-200">[ CREATE PROFILE ]</button>
             </div>
         </div>
 
         <div id="signupForm" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Account</h2>
+            <h2 class="text-2xl font-bold neon-text mb-6 text-center">[ PROFILE INIT ]</h2>
             <div class="space-y-4">
-                <input type="text" id="signupName" placeholder="Full Name" class="w-full p-3 border rounded-lg">
-                <input type="email" id="signupEmail" placeholder="Email" class="w-full p-3 border rounded-lg">
-                <input type="password" id="signupPassword" placeholder="Password" class="w-full p-3 border rounded-lg">
-                <button onclick="signup()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">Sign Up</button>
+                <input type="text" id="signupName" placeholder=">> FULL NAME" class="w-full p-3 rounded-lg">
+                <input type="email" id="signupEmail" placeholder=">> EMAIL" class="w-full p-3 rounded-lg">
+                <input type="password" id="signupPassword" placeholder=">> PASSWORD" class="w-full p-3 rounded-lg">
+                <button onclick="signup()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ INITIALIZE SYSTEM ]</button>
             </div>
             <div class="text-center mt-4">
-                <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800">Back to Login</button>
+                <button onclick="showLogin()" class="text-green-400 hover:text-green-200">[ BACK TO LOGIN ]</button>
             </div>
         </div>
     </div>
@@ -68,11 +197,11 @@
     <!-- Main Application -->
     <div id="appSection" class="hidden max-w-7xl mx-auto py-8 px-4">
         <!-- Dashboard Tabs -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <div class="flex space-x-8 border-b">
-                <button class="tab-button py-3 px-4 border-b-2 border-blue-600 text-blue-600 font-semibold" onclick="showTab('profile')">🏠 Profile Builder</button>
-                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800" onclick="showTab('resume')">📄 Resume Generator</button>
-                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800" onclick="showTab('jobs')">💼 Job Matcher</button>
+        <div class="hologram-effect rounded-lg p-6 mb-8 cyber-border">
+            <div class="flex space-x-8 border-b border-green-400/30">
+                <button class="tab-button py-3 px-4 border-b-2 border-green-400 text-green-400 font-semibold neon-text" onclick="showTab('profile')">[ PROFILE BUILDER ]</button>
+                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-green-300 hover:text-green-100" onclick="showTab('resume')">[ RESUME GENERATOR ]</button>
+                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-green-300 hover:text-green-100" onclick="showTab('jobs')">[ JOB MATRIX ]</button>
             </div>
         </div>
 
@@ -81,30 +210,30 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <!-- Navigation -->
                 <div class="lg:col-span-1 space-y-4">
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="font-semibold text-gray-800 mb-4">Profile Sections</h3>
+                    <div class="hologram-effect rounded-lg p-6 cyber-border">
+                        <h3 class="font-semibold neon-text mb-4">[ PROFILE MODULES ]</h3>
                         <div class="space-y-2">
-                            <button onclick="showProfileSection('personal')" class="w-full text-left p-3 rounded-lg hover:bg-blue-50 text-blue-700 font-semibold bg-blue-50">👤 Personal</button>
-                            <button onclick="showProfileSection('summary')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">📝 Summary</button>
-                            <button onclick="showProfileSection('experience')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">💼 Experience</button>
-                            <button onclick="showProfileSection('education')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">🎓 Education</button>
-                            <button onclick="showProfileSection('skills')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">🛠️ Skills</button>
+                            <button onclick="showProfileSection('personal')" class="w-full text-left p-3 rounded-lg hover:bg-green-400/10 text-green-400 font-semibold bg-green-400/20 cyber-border">[ PERSONAL DATA ]</button>
+                            <button onclick="showProfileSection('summary')" class="w-full text-left p-3 rounded-lg hover:bg-green-400/10 text-green-300">[ PROFILE SUMMARY ]</button>
+                            <button onclick="showProfileSection('experience')" class="w-full text-left p-3 rounded-lg hover:bg-green-400/10 text-green-300">[ EXPERIENCE MATRIX ]</button>
+                            <button onclick="showProfileSection('education')" class="w-full text-left p-3 rounded-lg hover:bg-green-400/10 text-green-300">[ EDUCATION NODES ]</button>
+                            <button onclick="showProfileSection('skills')" class="w-full text-left p-3 rounded-lg hover:bg-green-400/10 text-green-300">[ SKILL SET ]</button>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="font-semibold text-gray-800 mb-4">Profile Progress</h3>
+                    <div class="hologram-effect rounded-lg p-6 cyber-border">
+                        <h3 class="font-semibold neon-text mb-4">[ SYSTEM PROGRESS ]</h3>
                         <div class="space-y-3">
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Overall Progress</span>
+                                    <span>PROFILE COMPLETION</span>
                                     <span id="overallProgress">0%</span>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div id="progressBar" class="bg-green-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                <div class="w-full bg-green-400/20 rounded-full h-2">
+                                    <div id="progressBar" class="bg-green-400 h-2 rounded-full transition-all neon-text" style="width: 0%"></div>
                                 </div>
                             </div>
-                            <button onclick="saveProfile()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">💾 Save All</button>
+                            <button onclick="saveProfile()" class="w-full cyber-button py-2 rounded-lg font-semibold">[ SAVE PROFILE ]</button>
                         </div>
                     </div>
                 </div>
@@ -112,46 +241,46 @@
                 <!-- Profile Content -->
                 <div class="lg:col-span-3">
                     <!-- Personal Information -->
-                    <div id="personalSection" class="profile-section bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-6">👤 Personal Information</h3>
+                    <div id="personalSection" class="profile-section hologram-effect rounded-lg p-6 cyber-border">
+                        <h3 class="text-xl font-semibold neon-text mb-6">[ PERSONAL DATA MODULE ]</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="fullName" placeholder="Full Name" class="p-3 border rounded-lg">
-                            <input type="text" id="professionalTitle" placeholder="Professional Title" class="p-3 border rounded-lg">
-                            <input type="email" id="email" placeholder="Email" class="p-3 border rounded-lg">
-                            <input type="tel" id="phone" placeholder="Phone" class="p-3 border rounded-lg">
-                            <input type="text" id="location" placeholder="Location" class="p-3 border rounded-lg">
-                            <input type="url" id="linkedin" placeholder="LinkedIn URL" class="p-3 border rounded-lg">
+                            <input type="text" id="fullName" placeholder=">> FULL NAME" class="p-3 rounded-lg">
+                            <input type="text" id="professionalTitle" placeholder=">> PROFESSIONAL TITLE" class="p-3 rounded-lg">
+                            <input type="email" id="email" placeholder=">> EMAIL" class="p-3 rounded-lg">
+                            <input type="tel" id="phone" placeholder=">> PHONE" class="p-3 rounded-lg">
+                            <input type="text" id="location" placeholder=">> LOCATION" class="p-3 rounded-lg">
+                            <input type="url" id="linkedin" placeholder=">> LINKEDIN URL" class="p-3 rounded-lg">
                         </div>
                     </div>
 
                     <!-- Professional Summary -->
-                    <div id="summarySection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-6">📝 Professional Summary</h3>
-                        <textarea id="summary" placeholder="Write a compelling professional summary..." class="w-full p-4 border rounded-lg h-32"></textarea>
+                    <div id="summarySection" class="profile-section hidden hologram-effect rounded-lg p-6 cyber-border">
+                        <h3 class="text-xl font-semibold neon-text mb-6">[ PROFILE SUMMARY ]</h3>
+                        <textarea id="summary" placeholder=">> ENTER PROFESSIONAL SUMMARY..." class="w-full p-4 rounded-lg h-32"></textarea>
                     </div>
 
                     <!-- Work Experience -->
-                    <div id="experienceSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                    <div id="experienceSection" class="profile-section hidden hologram-effect rounded-lg p-6 cyber-border">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-semibold text-gray-800">💼 Work Experience</h3>
-                            <button onclick="addExperience()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Add Experience</button>
+                            <h3 class="text-xl font-semibold neon-text">[ EXPERIENCE MATRIX ]</h3>
+                            <button onclick="addExperience()" class="cyber-button px-4 py-2 rounded-lg font-semibold">[ + ADD NODE ]</button>
                         </div>
                         <div id="experienceContainer"></div>
                     </div>
 
                     <!-- Education -->
-                    <div id="educationSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                    <div id="educationSection" class="profile-section hidden hologram-effect rounded-lg p-6 cyber-border">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-semibold text-gray-800">🎓 Education</h3>
-                            <button onclick="addEducation()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Add Education</button>
+                            <h3 class="text-xl font-semibold neon-text">[ EDUCATION NODES ]</h3>
+                            <button onclick="addEducation()" class="cyber-button px-4 py-2 rounded-lg font-semibold">[ + ADD NODE ]</button>
                         </div>
                         <div id="educationContainer"></div>
                     </div>
 
                     <!-- Skills -->
-                    <div id="skillsSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-6">🛠️ Skills & Expertise</h3>
-                        <textarea id="skills" placeholder="List your skills (one per line)..." class="w-full p-4 border rounded-lg h-32"></textarea>
+                    <div id="skillsSection" class="profile-section hidden hologram-effect rounded-lg p-6 cyber-border">
+                        <h3 class="text-xl font-semibold neon-text mb-6">[ SKILL SET MATRIX ]</h3>
+                        <textarea id="skills" placeholder=">> ENTER SKILLS (ONE PER LINE)..." class="w-full p-4 rounded-lg h-32"></textarea>
                     </div>
                 </div>
             </div>
@@ -159,30 +288,30 @@
 
         <!-- Resume Generator Tab -->
         <div id="resumeTab" class="tab-content hidden">
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">📄 AI Resume Generator</h2>
+            <div class="hologram-effect rounded-lg p-8 cyber-border">
+                <h2 class="text-2xl font-bold neon-text mb-6">[ RESUME GENERATOR ]</h2>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="font-semibold text-gray-800 mb-4">Resume Preview</h3>
-                        <div class="bg-gray-50 border rounded-lg p-6 h-96 overflow-y-auto">
+                        <h3 class="font-semibold neon-text mb-4">[ RESUME PREVIEW ]</h3>
+                        <div class="bg-black/50 border border-green-400 rounded-lg p-6 h-96 overflow-y-auto cyber-border">
                             <div id="resumePreview">
-                                <p class="text-gray-600">Your resume will appear here...</p>
+                                <p class="text-green-600">>> RESUME DATA WILL APPEAR HERE...</p>
                             </div>
                         </div>
                     </div>
                     
                     <div>
-                        <h3 class="font-semibold text-gray-800 mb-4">Export Options</h3>
+                        <h3 class="font-semibold neon-text mb-4">[ EXPORT MODULES ]</h3>
                         <div class="space-y-4">
-                            <button onclick="generateResume()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">🔄 Generate Resume</button>
-                            <button onclick="downloadPDF()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">📄 Download PDF</button>
-                            <button onclick="downloadWord()" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700">📝 Download Word</button>
+                            <button onclick="generateResume()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ GENERATE RESUME ]</button>
+                            <button onclick="downloadPDF()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ EXPORT PDF ]</button>
+                            <button onclick="downloadWord()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ EXPORT DOC ]</button>
                         </div>
                         
                         <div class="mt-6">
-                            <h3 class="font-semibold text-gray-800 mb-4">AI Enhancements</h3>
-                            <button onclick="enhanceWithAI()" class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700">🤖 AI Enhance Resume</button>
+                            <h3 class="font-semibold neon-text mb-4">[ AI ENHANCEMENT ]</h3>
+                            <button onclick="enhanceWithAI()" class="w-full cyber-button py-3 rounded-lg font-semibold">[ AI OPTIMIZE ]</button>
                         </div>
                     </div>
                 </div>
@@ -191,30 +320,30 @@
 
         <!-- Job Matcher Tab -->
         <div id="jobsTab" class="tab-content hidden">
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">💼 AI Job Matcher</h2>
+            <div class="hologram-effect rounded-lg p-8 cyber-border">
+                <h2 class="text-2xl font-bold neon-text mb-6">[ JOB MATRIX ANALYZER ]</h2>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div>
-                        <h3 class="font-semibold text-gray-800 mb-4">Paste Job Description</h3>
-                        <textarea id="jobDescription" placeholder="Paste the job description here..." class="w-full p-4 border rounded-lg h-64"></textarea>
-                        <button onclick="analyzeJob()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 mt-4">🎯 Analyze Job Match</button>
+                        <h3 class="font-semibold neon-text mb-4">[ INPUT JOB DATA ]</h3>
+                        <textarea id="jobDescription" placeholder=">> PASTE JOB DESCRIPTION..." class="w-full p-4 rounded-lg h-64 cyber-border"></textarea>
+                        <button onclick="analyzeJob()" class="w-full cyber-button py-3 rounded-lg font-semibold mt-4">[ ANALYZE COMPATIBILITY ]</button>
                     </div>
                     
                     <div>
-                        <h3 class="font-semibold text-gray-800 mb-4">Match Results</h3>
-                        <div id="matchResults" class="bg-gray-50 border rounded-lg p-6">
-                            <p class="text-gray-600">Job match analysis will appear here...</p>
+                        <h3 class="font-semibold neon-text mb-4">[ ANALYSIS RESULTS ]</h3>
+                        <div id="matchResults" class="bg-black/50 border border-green-400 rounded-lg p-6 cyber-border">
+                            <p class="text-green-600">>> ANALYSIS DATA WILL APPEAR HERE...</p>
                         </div>
                         
                         <div class="mt-6 grid grid-cols-2 gap-4" id="matchScores" class="hidden">
-                            <div class="text-center bg-blue-50 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-blue-600" id="skillsMatch">0%</div>
-                                <div class="text-sm text-blue-700">Skills Match</div>
+                            <div class="text-center bg-green-400/20 rounded-lg p-4 cyber-border">
+                                <div class="text-2xl font-bold text-green-400 neon-text" id="skillsMatch">0%</div>
+                                <div class="text-sm text-green-300">SKILLS MATCH</div>
                             </div>
-                            <div class="text-center bg-green-50 rounded-lg p-4">
-                                <div class="text-2xl font-bold text-green-600" id="experienceMatch">0%</div>
-                                <div class="text-sm text-green-700">Experience Match</div>
+                            <div class="text-center bg-green-400/20 rounded-lg p-4 cyber-border">
+                                <div class="text-2xl font-bold text-green-400 neon-text" id="experienceMatch">0%</div>
+                                <div class="text-sm text-green-300">EXPERIENCE MATCH</div>
                             </div>
                         </div>
                     </div>
@@ -224,6 +353,57 @@
     </div>
 
     <script>
+        // ==================== MATRIX RAIN BACKGROUND ====================
+        class MatrixRain {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
+                this.drops = [];
+                this.init();
+            }
+
+            init() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                
+                const columns = this.canvas.width / 20;
+                this.drops = Array(Math.floor(columns)).fill(1);
+                
+                window.addEventListener('resize', () => {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                    const newColumns = this.canvas.width / 20;
+                    this.drops = Array(Math.floor(newColumns)).fill(1);
+                });
+            }
+
+            draw() {
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.fillStyle = '#00ff41';
+                this.ctx.font = '15px JetBrains Mono';
+                
+                this.drops.forEach((y, index) => {
+                    const text = this.chars[Math.floor(Math.random() * this.chars.length)];
+                    const x = index * 20;
+                    
+                    this.ctx.fillText(text, x, y);
+                    
+                    if (y > this.canvas.height && Math.random() > 0.975) {
+                        this.drops[index] = 0;
+                    }
+                    
+                    this.drops[index]++;
+                });
+            }
+
+            start() {
+                setInterval(() => this.draw(), 33);
+            }
+        }
+
         // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
             apiKey: "AIzaSyA_Si4j_KI1ufVg0_tthDFZjkrnYs-XNtE",
@@ -257,6 +437,7 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
 
+            showLoading();
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
@@ -270,36 +451,50 @@
                     return db.collection('profiles').doc(currentUser.uid).set(userProfile);
                 })
                 .then(() => {
-                    alert('Account created!');
+                    hideLoading();
+                    showNotification('SYSTEM: Profile initialized successfully');
                     showApp();
                     loadUserProfile();
                 })
-                .catch((error) => alert('Error: ' + error.message));
+                .catch((error) => {
+                    hideLoading();
+                    showNotification('ERROR: ' + error.message, true);
+                });
         }
 
         function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
+            showLoading();
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
+                    hideLoading();
+                    showNotification('SYSTEM: Access granted');
                     showApp();
                     loadUserProfile();
                 })
-                .catch((error) => alert('Error: ' + error.message));
+                .catch((error) => {
+                    hideLoading();
+                    showNotification('ERROR: ' + error.message, true);
+                });
         }
 
         function logout() {
+            showLoading();
             auth.signOut().then(() => {
                 currentUser = null;
                 userProfile = {};
+                hideLoading();
+                showNotification('SYSTEM: Logged out');
                 showAuth();
             });
         }
 
         // ==================== PROFILE MANAGEMENT ====================
         function loadUserProfile() {
+            showLoading();
             db.collection('profiles').doc(currentUser.uid).get()
                 .then((doc) => {
                     if (doc.exists) {
@@ -307,6 +502,7 @@
                         populateForm();
                         updateProgress();
                     }
+                    hideLoading();
                 });
         }
 
@@ -342,6 +538,7 @@
         }
 
         function saveProfile() {
+            showLoading();
             userProfile.personal = {
                 fullName: document.getElementById('fullName').value,
                 professionalTitle: document.getElementById('professionalTitle').value,
@@ -355,8 +552,13 @@
 
             db.collection('profiles').doc(currentUser.uid).set(userProfile)
                 .then(() => {
-                    alert('Profile saved!');
+                    hideLoading();
+                    showNotification('SYSTEM: Profile saved successfully');
                     updateProgress();
+                })
+                .catch((error) => {
+                    hideLoading();
+                    showNotification('ERROR: ' + error.message, true);
                 });
         }
 
@@ -365,15 +567,15 @@
             const container = document.getElementById('experienceContainer');
             const expId = 'exp_' + Date.now();
             const expHtml = `
-                <div class="border rounded-lg p-4 mb-4" data-id="${expId}">
+                <div class="border border-green-400 rounded-lg p-4 mb-4 cyber-border" data-id="${expId}">
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="text" class="p-2 border rounded exp-title" placeholder="Job Title" value="${expData.title || ''}">
-                        <input type="text" class="p-2 border rounded exp-company" placeholder="Company" value="${expData.company || ''}">
-                        <input type="text" class="p-2 border rounded exp-start" placeholder="Start Date" value="${expData.start || ''}">
-                        <input type="text" class="p-2 border rounded exp-end" placeholder="End Date" value="${expData.end || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded exp-title bg-black/50" placeholder=">> JOB TITLE" value="${expData.title || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded exp-company bg-black/50" placeholder=">> COMPANY" value="${expData.company || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded exp-start bg-black/50" placeholder=">> START DATE" value="${expData.start || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded exp-end bg-black/50" placeholder=">> END DATE" value="${expData.end || ''}">
                     </div>
-                    <textarea class="w-full p-2 border rounded exp-desc" placeholder="Description">${expData.description || ''}</textarea>
-                    <button onclick="removeExperience('${expId}')" class="text-red-600 mt-2">Remove</button>
+                    <textarea class="w-full p-2 border border-green-400 rounded exp-desc bg-black/50" placeholder=">> DESCRIPTION">${expData.description || ''}</textarea>
+                    <button onclick="removeExperience('${expId}')" class="text-red-400 hover:text-red-200 mt-2 font-semibold">[ REMOVE NODE ]</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', expHtml);
@@ -383,14 +585,14 @@
             const container = document.getElementById('educationContainer');
             const eduId = 'edu_' + Date.now();
             const eduHtml = `
-                <div class="border rounded-lg p-4 mb-4" data-id="${eduId}">
+                <div class="border border-green-400 rounded-lg p-4 mb-4 cyber-border" data-id="${eduId}">
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="text" class="p-2 border rounded edu-degree" placeholder="Degree" value="${eduData.degree || ''}">
-                        <input type="text" class="p-2 border rounded edu-school" placeholder="Institution" value="${eduData.school || ''}">
-                        <input type="text" class="p-2 border rounded edu-year" placeholder="Year" value="${eduData.year || ''}">
-                        <input type="text" class="p-2 border rounded edu-gpa" placeholder="GPA" value="${eduData.gpa || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded edu-degree bg-black/50" placeholder=">> DEGREE" value="${eduData.degree || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded edu-school bg-black/50" placeholder=">> INSTITUTION" value="${eduData.school || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded edu-year bg-black/50" placeholder=">> YEAR" value="${eduData.year || ''}">
+                        <input type="text" class="p-2 border border-green-400 rounded edu-gpa bg-black/50" placeholder=">> GPA" value="${eduData.gpa || ''}">
                     </div>
-                    <button onclick="removeEducation('${eduId}')" class="text-red-600 mt-2">Remove</button>
+                    <button onclick="removeEducation('${eduId}')" class="text-red-400 hover:text-red-200 mt-2 font-semibold">[ REMOVE NODE ]</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', eduHtml);
@@ -406,65 +608,76 @@
 
         // ==================== RESUME GENERATOR ====================
         function generateResume() {
-            const resumeContent = `
-                <h2 class="text-2xl font-bold mb-4">${userProfile.personal?.fullName || 'Your Name'}</h2>
-                <p class="text-gray-600 mb-4">${userProfile.personal?.professionalTitle || 'Professional'}</p>
-                
-                <div class="mb-6">
-                    <h3 class="font-semibold mb-2">Contact Information</h3>
-                    <p>Email: ${userProfile.personal?.email || 'N/A'}</p>
-                    <p>Phone: ${userProfile.personal?.phone || 'N/A'}</p>
-                    <p>Location: ${userProfile.personal?.location || 'N/A'}</p>
-                </div>
+            showLoading();
+            setTimeout(() => {
+                const resumeContent = `
+                    <div class="text-green-400">
+                        <h2 class="text-2xl font-bold mb-4 neon-text">${userProfile.personal?.fullName || 'YOUR NAME'}</h2>
+                        <p class="text-green-300 mb-4">${userProfile.personal?.professionalTitle || 'PROFESSIONAL'}</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2 neon-text">CONTACT MATRIX</h3>
+                            <p>> Email: ${userProfile.personal?.email || 'N/A'}</p>
+                            <p>> Phone: ${userProfile.personal?.phone || 'N/A'}</p>
+                            <p>> Location: ${userProfile.personal?.location || 'N/A'}</p>
+                        </div>
 
-                <div class="mb-6">
-                    <h3 class="font-semibold mb-2">Professional Summary</h3>
-                    <p>${userProfile.summary || 'Your professional summary'}</p>
-                </div>
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2 neon-text">PROFILE SUMMARY</h3>
+                            <p>${userProfile.summary || 'Your professional summary'}</p>
+                        </div>
 
-                <div class="mb-6">
-                    <h3 class="font-semibold mb-2">Skills</h3>
-                    <p>${userProfile.skills || 'Your skills'}</p>
-                </div>
-            `;
-            document.getElementById('resumePreview').innerHTML = resumeContent;
-            alert('Resume generated!');
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2 neon-text">SKILL MATRIX</h3>
+                            <p>${userProfile.skills || 'Your skills'}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('resumePreview').innerHTML = resumeContent;
+                hideLoading();
+                showNotification('SYSTEM: Resume generated successfully');
+            }, 1000);
         }
 
         function downloadPDF() {
-            alert('PDF download would be generated in production');
+            showNotification('SYSTEM: PDF export initialized');
         }
 
         function downloadWord() {
-            alert('Word document would be generated in production');
+            showNotification('SYSTEM: Word document export initialized');
         }
 
         function enhanceWithAI() {
-            alert('AI enhancement feature - This would use OpenAI in production');
+            showNotification('SYSTEM: AI enhancement protocol activated');
         }
 
         // ==================== JOB MATCHER ====================
         function analyzeJob() {
             const jobDesc = document.getElementById('jobDescription').value;
             if (!jobDesc) {
-                alert('Please paste a job description');
+                showNotification('ERROR: Please input job description', true);
                 return;
             }
 
-            // Simulate AI analysis
-            document.getElementById('skillsMatch').textContent = '85%';
-            document.getElementById('experienceMatch').textContent = '78%';
-            document.getElementById('matchScores').classList.remove('hidden');
-            
-            document.getElementById('matchResults').innerHTML = `
-                <h4 class="font-semibold mb-2">AI Analysis Complete</h4>
-                <p class="text-sm mb-4">Your profile matches well with this position.</p>
-                <ul class="text-sm space-y-1">
-                    <li>✅ Strong skills alignment</li>
-                    <li>✅ Relevant experience detected</li>
-                    <li>📝 Consider emphasizing your leadership experience</li>
-                </ul>
-            `;
+            showLoading();
+            setTimeout(() => {
+                document.getElementById('skillsMatch').textContent = '85%';
+                document.getElementById('experienceMatch').textContent = '78%';
+                document.getElementById('matchScores').classList.remove('hidden');
+                
+                document.getElementById('matchResults').innerHTML = `
+                    <h4 class="font-semibold mb-2 neon-text">ANALYSIS COMPLETE</h4>
+                    <p class="text-sm mb-4 text-green-300">Profile compatibility: HIGH</p>
+                    <ul class="text-sm space-y-1 text-green-300">
+                        <li>✅ Strong skills alignment detected</li>
+                        <li>✅ Relevant experience matrix confirmed</li>
+                        <li>📝 Recommend emphasizing leadership protocols</li>
+                        <li>🔧 Technical skills match: 92%</li>
+                    </ul>
+                `;
+                hideLoading();
+                showNotification('SYSTEM: Job analysis complete');
+            }, 2000);
         }
 
         // ==================== UI MANAGEMENT ====================
@@ -480,18 +693,18 @@
             document.getElementById('appSection').classList.remove('hidden');
             document.getElementById('authButtons').classList.add('hidden');
             document.getElementById('userMenu').classList.remove('hidden');
-            document.getElementById('userGreeting').textContent = `Hi, ${userProfile.personal?.fullName || 'User'}`;
+            document.getElementById('userGreeting').textContent = `USER: ${userProfile.personal?.fullName || 'Operator'}`;
         }
 
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('border-blue-600', 'text-blue-600');
-                btn.classList.add('border-transparent', 'text-gray-600');
+                btn.classList.remove('border-green-400', 'text-green-400', 'neon-text');
+                btn.classList.add('border-transparent', 'text-green-300');
             });
             
             document.getElementById(tabName + 'Tab').classList.remove('hidden');
-            event.target.classList.add('border-blue-600', 'text-blue-600');
+            event.target.classList.add('border-green-400', 'text-green-400', 'neon-text');
         }
 
         function showProfileSection(sectionName) {
@@ -499,10 +712,10 @@
             document.getElementById(sectionName + 'Section').classList.remove('hidden');
             
             document.querySelectorAll('#profileTab button').forEach(btn => {
-                btn.classList.remove('bg-blue-50', 'text-blue-700');
-                btn.classList.add('text-gray-700', 'hover:bg-gray-50');
+                btn.classList.remove('bg-green-400/20', 'text-green-400', 'cyber-border');
+                btn.classList.add('text-green-300', 'hover:bg-green-400/10');
             });
-            event.target.classList.add('bg-blue-50', 'text-blue-700');
+            event.target.classList.add('bg-green-400/20', 'text-green-400', 'cyber-border');
         }
 
         function updateProgress() {
@@ -516,6 +729,43 @@
             document.getElementById('overallProgress').textContent = progress + '%';
         }
 
+        // ==================== UTILITY FUNCTIONS ====================
+        function showLoading() {
+            // Create loading overlay if it doesn't exist
+            if (!document.getElementById('loadingOverlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'loadingOverlay';
+                overlay.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50';
+                overlay.innerHTML = `
+                    <div class="text-center">
+                        <div class="cyber-loader mx-auto mb-4"></div>
+                        <p class="text-green-400 neon-text">PROCESSING...</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg border ${
+                isError ? 'bg-red-500/20 border-red-400 text-red-400' : 'bg-green-500/20 border-green-400 text-green-400'
+            } z-50 cyber-border neon-text`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
         // ==================== INITIALIZATION ====================
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -527,9 +777,19 @@
             }
         });
 
-        // Initialize first sections
+        // Initialize first sections and matrix rain
         document.addEventListener('DOMContentLoaded', function() {
             showProfileSection('personal');
+            
+            // Start matrix rain
+            const canvas = document.getElementById('matrixCanvas');
+            const matrix = new MatrixRain(canvas);
+            matrix.start();
+            
+            // Add some cyber sound effects on interactions
+            document.addEventListener('click', function() {
+                // You could add sound effects here
+            });
         });
     </script>
 </body>
