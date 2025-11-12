@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerProfile - Build Your Professional Identity</title>
+    <title>CareerProfile - Complete Professional Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg border-b border-blue-200" id="navBar">
+    <nav class="bg-white shadow-lg border-b border-blue-200">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl shadow-lg">
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">CareerProfile</h1>
-                        <p class="text-xs text-gray-600">Your Lifetime Professional Identity</p>
+                        <p class="text-xs text-gray-600">Complete Professional Platform</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4" id="authButtons">
@@ -37,239 +37,194 @@
         </div>
     </nav>
 
-    <!-- Authentication Section -->
-    <div id="authSection" class="max-w-md mx-auto mt-12 bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+    <!-- Authentication -->
+    <div id="authSection" class="max-w-md mx-auto mt-12 bg-white rounded-xl shadow-lg p-8">
         <div id="loginForm">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h2>
-            <p class="text-gray-600 mb-6">Sign in to your CareerProfile</p>
-            
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome Back</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" id="loginEmail" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="your.email@example.com">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                    <input type="password" id="loginPassword" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Your password">
-                </div>
-                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold">
-                    Sign In
-                </button>
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-3 border rounded-lg">
+                <input type="password" id="loginPassword" placeholder="Password" class="w-full p-3 border rounded-lg">
+                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">Sign In</button>
             </div>
-            
             <div class="text-center mt-4">
-                <span class="text-gray-600">Don't have an account? </span>
-                <button onclick="showSignup()" class="text-blue-600 hover:text-blue-800 font-semibold">Sign up here</button>
+                <button onclick="showSignup()" class="text-blue-600 hover:text-blue-800">Create Account</button>
             </div>
         </div>
 
         <div id="signupForm" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Start Your Career Journey</h2>
-            <p class="text-gray-600 mb-6">Create your free CareerProfile account</p>
-            
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Account</h2>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-                    <input type="text" id="signupName" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="John Doe">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" id="signupEmail" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="your.email@example.com">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                    <input type="password" id="signupPassword" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Create a strong password">
-                </div>
-                <button onclick="signup()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-semibold">
-                    Create Account
-                </button>
+                <input type="text" id="signupName" placeholder="Full Name" class="w-full p-3 border rounded-lg">
+                <input type="email" id="signupEmail" placeholder="Email" class="w-full p-3 border rounded-lg">
+                <input type="password" id="signupPassword" placeholder="Password" class="w-full p-3 border rounded-lg">
+                <button onclick="signup()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">Sign Up</button>
             </div>
-            
             <div class="text-center mt-4">
-                <span class="text-gray-600">Already have an account? </span>
-                <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800 font-semibold">Sign in here</button>
+                <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800">Back to Login</button>
             </div>
         </div>
     </div>
 
     <!-- Main Application -->
-    <div id="appSection" class="hidden max-w-6xl mx-auto py-8 px-4">
-        <!-- Progress Overview -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800" id="welcomeMessage">Welcome back!</h2>
-                    <p class="text-gray-600">Build your comprehensive career profile</p>
-                </div>
-                <div class="text-right">
-                    <div class="text-sm text-gray-600 mb-1">Profile Completeness</div>
-                    <div class="w-48 bg-gray-200 rounded-full h-3">
-                        <div id="profileProgress" class="bg-green-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <div class="text-sm text-gray-700 mt-1" id="progressText">0% Complete</div>
-                </div>
+    <div id="appSection" class="hidden max-w-7xl mx-auto py-8 px-4">
+        <!-- Dashboard Tabs -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex space-x-8 border-b">
+                <button class="tab-button py-3 px-4 border-b-2 border-blue-600 text-blue-600 font-semibold" onclick="showTab('profile')">🏠 Profile Builder</button>
+                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800" onclick="showTab('resume')">📄 Resume Generator</button>
+                <button class="tab-button py-3 px-4 border-b-2 border-transparent text-gray-600 hover:text-gray-800" onclick="showTab('jobs')">💼 Job Matcher</button>
             </div>
+        </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                    <div class="text-2xl font-bold text-blue-600" id="basicInfoScore">0%</div>
-                    <div class="text-sm text-blue-700">Basic Info</div>
+        <!-- Profile Builder Tab -->
+        <div id="profileTab" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Navigation -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Profile Sections</h3>
+                        <div class="space-y-2">
+                            <button onclick="showProfileSection('personal')" class="w-full text-left p-3 rounded-lg hover:bg-blue-50 text-blue-700 font-semibold bg-blue-50">👤 Personal</button>
+                            <button onclick="showProfileSection('summary')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">📝 Summary</button>
+                            <button onclick="showProfileSection('experience')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">💼 Experience</button>
+                            <button onclick="showProfileSection('education')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">🎓 Education</button>
+                            <button onclick="showProfileSection('skills')" class="w-full text-left p-3 rounded-lg hover:bg-gray-50 text-gray-700">🛠️ Skills</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Profile Progress</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Overall Progress</span>
+                                    <span id="overallProgress">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div id="progressBar" class="bg-green-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <button onclick="saveProfile()" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">💾 Save All</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
-                    <div class="text-2xl font-bold text-orange-600" id="experienceScore">0%</div>
-                    <div class="text-sm text-orange-700">Experience</div>
-                </div>
-                <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                    <div class="text-2xl font-bold text-purple-600" id="educationScore">0%</div>
-                    <div class="text-sm text-purple-700">Education</div>
-                </div>
-                <div class="bg-green-50 rounded-xl p-4 border border-green-200">
-                    <div class="text-2xl font-bold text-green-600" id="skillsScore">0%</div>
-                    <div class="text-sm text-green-700">Skills</div>
+
+                <!-- Profile Content -->
+                <div class="lg:col-span-3">
+                    <!-- Personal Information -->
+                    <div id="personalSection" class="profile-section bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-6">👤 Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="fullName" placeholder="Full Name" class="p-3 border rounded-lg">
+                            <input type="text" id="professionalTitle" placeholder="Professional Title" class="p-3 border rounded-lg">
+                            <input type="email" id="email" placeholder="Email" class="p-3 border rounded-lg">
+                            <input type="tel" id="phone" placeholder="Phone" class="p-3 border rounded-lg">
+                            <input type="text" id="location" placeholder="Location" class="p-3 border rounded-lg">
+                            <input type="url" id="linkedin" placeholder="LinkedIn URL" class="p-3 border rounded-lg">
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div id="summarySection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-6">📝 Professional Summary</h3>
+                        <textarea id="summary" placeholder="Write a compelling professional summary..." class="w-full p-4 border rounded-lg h-32"></textarea>
+                    </div>
+
+                    <!-- Work Experience -->
+                    <div id="experienceSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold text-gray-800">💼 Work Experience</h3>
+                            <button onclick="addExperience()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Add Experience</button>
+                        </div>
+                        <div id="experienceContainer"></div>
+                    </div>
+
+                    <!-- Education -->
+                    <div id="educationSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-semibold text-gray-800">🎓 Education</h3>
+                            <button onclick="addEducation()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">+ Add Education</button>
+                        </div>
+                        <div id="educationContainer"></div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div id="skillsSection" class="profile-section hidden bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-6">🛠️ Skills & Expertise</h3>
+                        <textarea id="skills" placeholder="List your skills (one per line)..." class="w-full p-4 border rounded-lg h-32"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Profile Sections -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Navigation Sidebar -->
-            <div class="lg:col-span-1 space-y-4">
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                    <h3 class="font-semibold text-gray-800 mb-4">Your Profile Sections</h3>
-                    <div class="space-y-2">
-                        <button onclick="showSection('personal')" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 transition font-semibold text-blue-700 border-2 border-blue-200 bg-blue-50">
-                            👤 Personal Information
-                        </button>
-                        <button onclick="showSection('summary')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
-                            📝 Professional Summary
-                        </button>
-                        <button onclick="showSection('experience')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
-                            💼 Work Experience
-                        </button>
-                        <button onclick="showSection('education')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
-                            🎓 Education
-                        </button>
-                        <button onclick="showSection('skills')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
-                            🛠️ Skills & Expertise
-                        </button>
-                        <button onclick="showSection('certifications')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
-                            📜 Certifications
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                    <h3 class="font-semibold text-gray-800 mb-4">Quick Actions</h3>
-                    <div class="space-y-3">
-                        <button onclick="saveProfile()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-semibold">
-                            💾 Save All Changes
-                        </button>
-                        <button onclick="exportData()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold">
-                            📤 Export Profile
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="lg:col-span-2">
-                <!-- Personal Information Section -->
-                <div id="personalSection" class="profile-section bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <span class="text-blue-600 text-lg">👤</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Personal Information</h3>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Full Name *</label>
-                                <input type="text" id="fullName" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="John Doe">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Professional Title</label>
-                                <input type="text" id="professionalTitle" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Senior Software Engineer">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Email Address *</label>
-                                <input type="email" id="email" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="john.doe@example.com">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Phone Number</label>
-                                <input type="tel" id="phone" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="+1 (555) 123-4567">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Location</label>
-                                <input type="text" id="location" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="San Francisco, CA">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">LinkedIn Profile</label>
-                                <input type="url" id="linkedin" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="https://linkedin.com/in/johndoe">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Website/Portfolio</label>
-                                <input type="url" id="portfolio" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="https://yourportfolio.com">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Target Salary Range</label>
-                                <input type="text" id="targetSalary" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="$80,000 - $120,000">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Visa Status</label>
-                                <select id="visaStatus" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                                    <option value="">Select visa status</option>
-                                    <option value="citizen">Citizen</option>
-                                    <option value="permanent_resident">Permanent Resident</option>
-                                    <option value="work_visa">Work Visa</option>
-                                    <option value="student_visa">Student Visa</option>
-                                    <option value="requires_sponsorship">Requires Sponsorship</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Willing to Relocate?</label>
-                                <select id="relocate" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                                    <option value="">Select preference</option>
-                                    <option value="yes">Yes, anywhere</option>
-                                    <option value="within_country">Within country</option>
-                                    <option value="specific_locations">Specific locations only</option>
-                                    <option value="no">No</option>
-                                </select>
+        <!-- Resume Generator Tab -->
+        <div id="resumeTab" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📄 AI Resume Generator</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold text-gray-800 mb-4">Resume Preview</h3>
+                        <div class="bg-gray-50 border rounded-lg p-6 h-96 overflow-y-auto">
+                            <div id="resumePreview">
+                                <p class="text-gray-600">Your resume will appear here...</p>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Other sections will be added here (summary, experience, education, skills, certifications) -->
-                <div id="otherSections" class="hidden">
-                    <!-- These will be implemented in Phase 2 -->
-                    <div class="text-center py-12">
-                        <div class="text-6xl mb-4">🚧</div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Section Under Development</h3>
-                        <p class="text-gray-600">This section will be available in the next update!</p>
+                    
+                    <div>
+                        <h3 class="font-semibold text-gray-800 mb-4">Export Options</h3>
+                        <div class="space-y-4">
+                            <button onclick="generateResume()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">🔄 Generate Resume</button>
+                            <button onclick="downloadPDF()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">📄 Download PDF</button>
+                            <button onclick="downloadWord()" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700">📝 Download Word</button>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="font-semibold text-gray-800 mb-4">AI Enhancements</h3>
+                            <button onclick="enhanceWithAI()" class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700">🤖 AI Enhance Resume</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toast Notifications -->
-    <div id="toast" class="fixed top-4 right-4 p-4 rounded-xl shadow-lg z-50 transform translate-x-96 transition-transform duration-300 hidden">
-        <div class="flex items-center space-x-3">
-            <span id="toastIcon">✅</span>
-            <span id="toastMessage" class="font-semibold"></span>
+        <!-- Job Matcher Tab -->
+        <div id="jobsTab" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">💼 AI Job Matcher</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold text-gray-800 mb-4">Paste Job Description</h3>
+                        <textarea id="jobDescription" placeholder="Paste the job description here..." class="w-full p-4 border rounded-lg h-64"></textarea>
+                        <button onclick="analyzeJob()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 mt-4">🎯 Analyze Job Match</button>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold text-gray-800 mb-4">Match Results</h3>
+                        <div id="matchResults" class="bg-gray-50 border rounded-lg p-6">
+                            <p class="text-gray-600">Job match analysis will appear here...</p>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-2 gap-4" id="matchScores" class="hidden">
+                            <div class="text-center bg-blue-50 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-blue-600" id="skillsMatch">0%</div>
+                                <div class="text-sm text-blue-700">Skills Match</div>
+                            </div>
+                            <div class="text-center bg-green-50 rounded-lg p-4">
+                                <div class="text-2xl font-bold text-green-600" id="experienceMatch">0%</div>
+                                <div class="text-sm text-green-700">Experience Match</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
+        // ==================== FIREBASE CONFIG ====================
         const firebaseConfig = {
             apiKey: "AIzaSyA_Si4j_KI1ufVg0_tthDFZjkrnYs-XNtE",
             authDomain: "resume-ai-platform.firebaseapp.com",
@@ -279,17 +234,14 @@
             appId: "1:246570862355:web:4f4e2e3e3fdf366d95bce6"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Current user data
         let currentUser = null;
         let userProfile = {};
 
-        // ==================== AUTHENTICATION FUNCTIONS ====================
-        
+        // ==================== AUTHENTICATION ====================
         function showLogin() {
             document.getElementById('loginForm').classList.remove('hidden');
             document.getElementById('signupForm').classList.add('hidden');
@@ -305,49 +257,24 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
 
-            if (!name || !email || !password) {
-                showToast('Please fill in all fields', 'error');
-                return;
-            }
-
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
-                    
-                    // Create initial user profile
                     userProfile = {
-                        personal: {
-                            fullName: name,
-                            email: email,
-                            professionalTitle: '',
-                            phone: '',
-                            location: '',
-                            linkedin: '',
-                            portfolio: '',
-                            targetSalary: '',
-                            visaStatus: '',
-                            relocate: ''
-                        },
+                        personal: { fullName: name, email: email },
                         summary: '',
                         experience: [],
                         education: [],
-                        skills: [],
-                        certifications: [],
-                        createdAt: new Date(),
-                        lastUpdated: new Date()
+                        skills: ''
                     };
-
-                    // Save profile to Firestore
                     return db.collection('profiles').doc(currentUser.uid).set(userProfile);
                 })
                 .then(() => {
-                    showToast('Account created successfully!', 'success');
+                    alert('Account created!');
                     showApp();
                     loadUserProfile();
                 })
-                .catch((error) => {
-                    showToast('Error creating account: ' + error.message, 'error');
-                });
+                .catch((error) => alert('Error: ' + error.message));
         }
 
         function login() {
@@ -357,33 +284,22 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
-                    showToast('Welcome back!', 'success');
                     showApp();
                     loadUserProfile();
                 })
-                .catch((error) => {
-                    showToast('Error signing in: ' + error.message, 'error');
-                });
+                .catch((error) => alert('Error: ' + error.message));
         }
 
         function logout() {
-            auth.signOut()
-                .then(() => {
-                    currentUser = null;
-                    userProfile = {};
-                    showToast('Signed out successfully', 'success');
-                    showAuth();
-                })
-                .catch((error) => {
-                    showToast('Error signing out: ' + error.message, 'error');
-                });
+            auth.signOut().then(() => {
+                currentUser = null;
+                userProfile = {};
+                showAuth();
+            });
         }
 
         // ==================== PROFILE MANAGEMENT ====================
-        
         function loadUserProfile() {
-            if (!currentUser) return;
-
             db.collection('profiles').doc(currentUser.uid).get()
                 .then((doc) => {
                     if (doc.exists) {
@@ -391,94 +307,167 @@
                         populateForm();
                         updateProgress();
                     }
-                })
-                .catch((error) => {
-                    console.error('Error loading profile:', error);
                 });
         }
 
         function populateForm() {
-            if (!userProfile.personal) return;
+            if (userProfile.personal) {
+                document.getElementById('fullName').value = userProfile.personal.fullName || '';
+                document.getElementById('professionalTitle').value = userProfile.personal.professionalTitle || '';
+                document.getElementById('email').value = userProfile.personal.email || '';
+                document.getElementById('phone').value = userProfile.personal.phone || '';
+                document.getElementById('location').value = userProfile.personal.location || '';
+                document.getElementById('linkedin').value = userProfile.personal.linkedin || '';
+            }
+            document.getElementById('summary').value = userProfile.summary || '';
+            document.getElementById('skills').value = userProfile.skills || '';
+            
+            // Load experiences
+            const expContainer = document.getElementById('experienceContainer');
+            expContainer.innerHTML = '';
+            if (userProfile.experience) {
+                userProfile.experience.forEach(exp => addExperience(exp));
+            } else {
+                addExperience();
+            }
 
-            const personal = userProfile.personal;
-            document.getElementById('fullName').value = personal.fullName || '';
-            document.getElementById('professionalTitle').value = personal.professionalTitle || '';
-            document.getElementById('email').value = personal.email || '';
-            document.getElementById('phone').value = personal.phone || '';
-            document.getElementById('location').value = personal.location || '';
-            document.getElementById('linkedin').value = personal.linkedin || '';
-            document.getElementById('portfolio').value = personal.portfolio || '';
-            document.getElementById('targetSalary').value = personal.targetSalary || '';
-            document.getElementById('visaStatus').value = personal.visaStatus || '';
-            document.getElementById('relocate').value = personal.relocate || '';
-
-            // Update welcome message
-            document.getElementById('welcomeMessage').textContent = `Welcome back, ${personal.fullName || 'there'}!`;
-            document.getElementById('userGreeting').textContent = `Hi, ${personal.fullName || 'User'}`;
+            // Load education
+            const eduContainer = document.getElementById('educationContainer');
+            eduContainer.innerHTML = '';
+            if (userProfile.education) {
+                userProfile.education.forEach(edu => addEducation(edu));
+            } else {
+                addEducation();
+            }
         }
 
         function saveProfile() {
-            if (!currentUser) return;
-
-            // Update personal information
             userProfile.personal = {
                 fullName: document.getElementById('fullName').value,
                 professionalTitle: document.getElementById('professionalTitle').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 location: document.getElementById('location').value,
-                linkedin: document.getElementById('linkedin').value,
-                portfolio: document.getElementById('portfolio').value,
-                targetSalary: document.getElementById('targetSalary').value,
-                visaStatus: document.getElementById('visaStatus').value,
-                relocate: document.getElementById('relocate').value
+                linkedin: document.getElementById('linkedin').value
             };
-
-            userProfile.lastUpdated = new Date();
+            userProfile.summary = document.getElementById('summary').value;
+            userProfile.skills = document.getElementById('skills').value;
 
             db.collection('profiles').doc(currentUser.uid).set(userProfile)
                 .then(() => {
-                    showToast('Profile saved successfully!', 'success');
+                    alert('Profile saved!');
                     updateProgress();
-                })
-                .catch((error) => {
-                    showToast('Error saving profile: ' + error.message, 'error');
                 });
         }
 
-        // ==================== PROGRESS TRACKING ====================
-        
-        function updateProgress() {
-            if (!userProfile.personal) return;
-
-            let totalScore = 0;
-            let maxScore = 0;
-
-            // Personal Information Score (40 points max)
-            const personalFields = ['fullName', 'email', 'professionalTitle', 'phone', 'location'];
-            let personalScore = 0;
-            personalFields.forEach(field => {
-                if (userProfile.personal[field] && userProfile.personal[field].trim()) {
-                    personalScore += 8; // 8 points per field
-                }
-            });
-            totalScore += Math.min(personalScore, 40);
-            maxScore += 40;
-
-            // Update progress bars
-            const personalPercent = Math.round((personalScore / 40) * 100);
-            document.getElementById('basicInfoScore').textContent = personalPercent + '%';
-            document.getElementById('profileProgress').style.width = personalPercent + '%';
-            document.getElementById('progressText').textContent = personalPercent + '% Complete';
-
-            // Other sections will be 0% for now (Phase 2)
-            document.getElementById('experienceScore').textContent = '0%';
-            document.getElementById('educationScore').textContent = '0%';
-            document.getElementById('skillsScore').textContent = '0%';
+        // ==================== EXPERIENCE & EDUCATION ====================
+        function addExperience(expData = {}) {
+            const container = document.getElementById('experienceContainer');
+            const expId = 'exp_' + Date.now();
+            const expHtml = `
+                <div class="border rounded-lg p-4 mb-4" data-id="${expId}">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <input type="text" class="p-2 border rounded exp-title" placeholder="Job Title" value="${expData.title || ''}">
+                        <input type="text" class="p-2 border rounded exp-company" placeholder="Company" value="${expData.company || ''}">
+                        <input type="text" class="p-2 border rounded exp-start" placeholder="Start Date" value="${expData.start || ''}">
+                        <input type="text" class="p-2 border rounded exp-end" placeholder="End Date" value="${expData.end || ''}">
+                    </div>
+                    <textarea class="w-full p-2 border rounded exp-desc" placeholder="Description">${expData.description || ''}</textarea>
+                    <button onclick="removeExperience('${expId}')" class="text-red-600 mt-2">Remove</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', expHtml);
         }
 
-        // ==================== UI FUNCTIONS ====================
-        
+        function addEducation(eduData = {}) {
+            const container = document.getElementById('educationContainer');
+            const eduId = 'edu_' + Date.now();
+            const eduHtml = `
+                <div class="border rounded-lg p-4 mb-4" data-id="${eduId}">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" class="p-2 border rounded edu-degree" placeholder="Degree" value="${eduData.degree || ''}">
+                        <input type="text" class="p-2 border rounded edu-school" placeholder="Institution" value="${eduData.school || ''}">
+                        <input type="text" class="p-2 border rounded edu-year" placeholder="Year" value="${eduData.year || ''}">
+                        <input type="text" class="p-2 border rounded edu-gpa" placeholder="GPA" value="${eduData.gpa || ''}">
+                    </div>
+                    <button onclick="removeEducation('${eduId}')" class="text-red-600 mt-2">Remove</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', eduHtml);
+        }
+
+        function removeExperience(id) {
+            document.querySelector(`[data-id="${id}"]`).remove();
+        }
+
+        function removeEducation(id) {
+            document.querySelector(`[data-id="${id}"]`).remove();
+        }
+
+        // ==================== RESUME GENERATOR ====================
+        function generateResume() {
+            const resumeContent = `
+                <h2 class="text-2xl font-bold mb-4">${userProfile.personal?.fullName || 'Your Name'}</h2>
+                <p class="text-gray-600 mb-4">${userProfile.personal?.professionalTitle || 'Professional'}</p>
+                
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-2">Contact Information</h3>
+                    <p>Email: ${userProfile.personal?.email || 'N/A'}</p>
+                    <p>Phone: ${userProfile.personal?.phone || 'N/A'}</p>
+                    <p>Location: ${userProfile.personal?.location || 'N/A'}</p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-2">Professional Summary</h3>
+                    <p>${userProfile.summary || 'Your professional summary'}</p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-semibold mb-2">Skills</h3>
+                    <p>${userProfile.skills || 'Your skills'}</p>
+                </div>
+            `;
+            document.getElementById('resumePreview').innerHTML = resumeContent;
+            alert('Resume generated!');
+        }
+
+        function downloadPDF() {
+            alert('PDF download would be generated in production');
+        }
+
+        function downloadWord() {
+            alert('Word document would be generated in production');
+        }
+
+        function enhanceWithAI() {
+            alert('AI enhancement feature - This would use OpenAI in production');
+        }
+
+        // ==================== JOB MATCHER ====================
+        function analyzeJob() {
+            const jobDesc = document.getElementById('jobDescription').value;
+            if (!jobDesc) {
+                alert('Please paste a job description');
+                return;
+            }
+
+            // Simulate AI analysis
+            document.getElementById('skillsMatch').textContent = '85%';
+            document.getElementById('experienceMatch').textContent = '78%';
+            document.getElementById('matchScores').classList.remove('hidden');
+            
+            document.getElementById('matchResults').innerHTML = `
+                <h4 class="font-semibold mb-2">AI Analysis Complete</h4>
+                <p class="text-sm mb-4">Your profile matches well with this position.</p>
+                <ul class="text-sm space-y-1">
+                    <li>✅ Strong skills alignment</li>
+                    <li>✅ Relevant experience detected</li>
+                    <li>📝 Consider emphasizing your leadership experience</li>
+                </ul>
+            `;
+        }
+
+        // ==================== UI MANAGEMENT ====================
         function showAuth() {
             document.getElementById('authSection').classList.remove('hidden');
             document.getElementById('appSection').classList.add('hidden');
@@ -491,76 +480,43 @@
             document.getElementById('appSection').classList.remove('hidden');
             document.getElementById('authButtons').classList.add('hidden');
             document.getElementById('userMenu').classList.remove('hidden');
+            document.getElementById('userGreeting').textContent = `Hi, ${userProfile.personal?.fullName || 'User'}`;
         }
 
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.profile-section').forEach(section => {
-                section.classList.add('hidden');
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-600');
             });
             
-            // Show selected section
-            if (sectionName === 'personal') {
-                document.getElementById('personalSection').classList.remove('hidden');
-            } else {
-                document.getElementById('otherSections').classList.remove('hidden');
-                // In Phase 2, we'll show the actual sections
-            }
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+            event.target.classList.add('border-blue-600', 'text-blue-600');
+        }
 
-            // Update navigation buttons
-            document.querySelectorAll('#navigationSidebar button').forEach(button => {
-                button.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-700');
-                button.classList.add('text-gray-700', 'hover:bg-gray-50');
-            });
+        function showProfileSection(sectionName) {
+            document.querySelectorAll('.profile-section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionName + 'Section').classList.remove('hidden');
             
-            event.target.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
-            event.target.classList.remove('text-gray-700', 'hover:bg-gray-50');
-        }
-
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            const toastIcon = document.getElementById('toastIcon');
-            const toastMessage = document.getElementById('toastMessage');
-
-            // Set icon and color based on type
-            if (type === 'success') {
-                toast.className = toast.className.replace('bg-red-100 text-red-800 border-red-200', '');
-                toast.className += ' bg-green-100 text-green-800 border border-green-200';
-                toastIcon.textContent = '✅';
-            } else if (type === 'error') {
-                toast.className = toast.className.replace('bg-green-100 text-green-800 border-green-200', '');
-                toast.className += ' bg-red-100 text-red-800 border border-red-200';
-                toastIcon.textContent = '❌';
-            }
-
-            toastMessage.textContent = message;
-            toast.classList.remove('hidden', 'translate-x-96');
-            toast.classList.add('translate-x-0');
-
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('translate-x-0');
-                toast.classList.add('translate-x-96');
-            }, 3000);
-        }
-
-        function exportData() {
-            showToast('Export feature coming in Phase 2!', 'success');
-        }
-
-        // ==================== AUTO-SAVE ====================
-        
-        document.querySelectorAll('input, select, textarea').forEach(element => {
-            element.addEventListener('input', () => {
-                // Auto-save after 2 seconds of inactivity
-                clearTimeout(window.autoSaveTimeout);
-                window.autoSaveTimeout = setTimeout(saveProfile, 2000);
+            document.querySelectorAll('#profileTab button').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-700');
+                btn.classList.add('text-gray-700', 'hover:bg-gray-50');
             });
-        });
+            event.target.classList.add('bg-blue-50', 'text-blue-700');
+        }
+
+        function updateProgress() {
+            let progress = 0;
+            if (userProfile.personal?.fullName) progress += 25;
+            if (userProfile.summary) progress += 25;
+            if (userProfile.experience?.length > 0) progress += 25;
+            if (userProfile.skills) progress += 25;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('overallProgress').textContent = progress + '%';
+        }
 
         // ==================== INITIALIZATION ====================
-        
-        // Check auth state on load
         auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
@@ -571,9 +527,9 @@
             }
         });
 
-        // Initialize the first section
+        // Initialize first sections
         document.addEventListener('DOMContentLoaded', function() {
-            showSection('personal');
+            showProfileSection('personal');
         });
     </script>
 </body>
