@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResumeAI - AI-Powered Resume Builder</title>
+    <title>CareerProfile - Build Your Professional Identity</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .ai-processing {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg border-b border-blue-200">
+    <nav class="bg-white shadow-lg border-b border-blue-200" id="navBar">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-3">
@@ -27,492 +21,559 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ResumeAI</h1>
-                        <p class="text-xs text-gray-600">AI-Powered Resume Builder</p>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">CareerProfile</h1>
+                        <p class="text-xs text-gray-600">Your Lifetime Professional Identity</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-sm font-semibold text-blue-700">AI Ready</span>
+                <div class="flex items-center space-x-4" id="authButtons">
+                    <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800 font-semibold">Login</button>
+                    <button onclick="showSignup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Sign Up Free</button>
+                </div>
+                <div class="hidden items-center space-x-4" id="userMenu">
+                    <span class="text-gray-700" id="userGreeting">Welcome, User!</span>
+                    <button onclick="logout()" class="text-gray-600 hover:text-gray-800 font-semibold">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="max-w-6xl mx-auto py-8 px-4">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">Build Your Perfect Resume with AI</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Upload any resume format and let our AI extract, organize, and enhance your professional information automatically.</p>
+    <!-- Authentication Section -->
+    <div id="authSection" class="max-w-md mx-auto mt-12 bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <div id="loginForm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h2>
+            <p class="text-gray-600 mb-6">Sign in to your CareerProfile</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="loginEmail" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="your.email@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Your password">
+                </div>
+                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold">
+                    Sign In
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <span class="text-gray-600">Don't have an account? </span>
+                <button onclick="showSignup()" class="text-blue-600 hover:text-blue-800 font-semibold">Sign up here</button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Left Sidebar - Upload & Actions -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- AI Upload Card -->
-                <div class="bg-white rounded-2xl shadow-lg border border-blue-100 p-6">
-                    <div class="text-center mb-4">
-                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold text-gray-800 text-lg">AI Resume Analysis</h3>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div class="border-2 border-dashed border-blue-200 rounded-xl p-6 text-center bg-blue-50 hover:bg-blue-100 transition cursor-pointer" onclick="document.getElementById('resumeUpload').click()">
-                            <input type="file" id="resumeUpload" accept=".pdf,.docx,.doc,.txt,.jpg,.png" class="hidden">
-                            <div class="text-blue-600 font-semibold mb-2">📁 Upload Your Resume</div>
-                            <p class="text-xs text-gray-600">PDF, Word, Image, Text - Any Format</p>
-                        </div>
-                        
-                        <div id="uploadStatus" class="text-center">
-                            <p class="text-sm text-gray-500">AI will analyze and auto-fill your information</p>
-                        </div>
-                    </div>
+        <div id="signupForm" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Start Your Career Journey</h2>
+            <p class="text-gray-600 mb-6">Create your free CareerProfile account</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                    <input type="text" id="signupName" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="John Doe">
                 </div>
-
-                <!-- Progress & Actions -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                    <h4 class="font-semibold text-gray-800 mb-4">Quick Actions</h4>
-                    
-                    <div class="space-y-3">
-                        <button onclick="enhanceWithAI()" class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl hover:from-purple-700 hover:to-blue-700 transition shadow-lg font-semibold flex items-center justify-center space-x-2">
-                            <span>🧠 Enhance with AI</span>
-                        </button>
-                        
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="downloadPDF()" class="bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-semibold text-sm">
-                                📄 PDF
-                            </button>
-                            <button onclick="downloadWord()" class="bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold text-sm">
-                                📝 Word
-                            </button>
-                        </div>
-                        
-                        <button onclick="clearForm()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition font-semibold">
-                            🗑️ Clear All
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="signupEmail" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="your.email@example.com">
                 </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                    <input type="password" id="signupPassword" class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Create a strong password">
+                </div>
+                <button onclick="signup()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-semibold">
+                    Create Account
+                </button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <span class="text-gray-600">Already have an account? </span>
+                <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800 font-semibold">Sign in here</button>
+            </div>
+        </div>
+    </div>
 
-                <!-- AI Suggestions -->
-                <div id="aiSuggestions" class="hidden bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl shadow-lg border border-green-200 p-6">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                            <span class="text-white text-sm">🤖</span>
-                        </div>
-                        <h4 class="font-semibold text-green-800">AI Suggestions</h4>
+    <!-- Main Application -->
+    <div id="appSection" class="hidden max-w-6xl mx-auto py-8 px-4">
+        <!-- Progress Overview -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800" id="welcomeMessage">Welcome back!</h2>
+                    <p class="text-gray-600">Build your comprehensive career profile</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-600 mb-1">Profile Completeness</div>
+                    <div class="w-48 bg-gray-200 rounded-full h-3">
+                        <div id="profileProgress" class="bg-green-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <div id="suggestionsContent" class="text-sm text-green-700 space-y-2"></div>
+                    <div class="text-sm text-gray-700 mt-1" id="progressText">0% Complete</div>
                 </div>
             </div>
 
-            <!-- Main Form Area -->
-            <div class="lg:col-span-3">
-                <!-- AI Processing Animation -->
-                <div id="aiProcessing" class="hidden bg-white rounded-2xl shadow-lg border border-blue-200 p-8 mb-6 text-center">
-                    <div class="max-w-md mx-auto">
-                        <div class="ai-processing mb-6">
-                            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
-                                <svg class="w-10 h-10 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <div class="text-2xl font-bold text-blue-600" id="basicInfoScore">0%</div>
+                    <div class="text-sm text-blue-700">Basic Info</div>
+                </div>
+                <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                    <div class="text-2xl font-bold text-orange-600" id="experienceScore">0%</div>
+                    <div class="text-sm text-orange-700">Experience</div>
+                </div>
+                <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                    <div class="text-2xl font-bold text-purple-600" id="educationScore">0%</div>
+                    <div class="text-sm text-purple-700">Education</div>
+                </div>
+                <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                    <div class="text-2xl font-bold text-green-600" id="skillsScore">0%</div>
+                    <div class="text-sm text-green-700">Skills</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Navigation Sidebar -->
+            <div class="lg:col-span-1 space-y-4">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4">Your Profile Sections</h3>
+                    <div class="space-y-2">
+                        <button onclick="showSection('personal')" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 transition font-semibold text-blue-700 border-2 border-blue-200 bg-blue-50">
+                            👤 Personal Information
+                        </button>
+                        <button onclick="showSection('summary')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+                            📝 Professional Summary
+                        </button>
+                        <button onclick="showSection('experience')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+                            💼 Work Experience
+                        </button>
+                        <button onclick="showSection('education')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+                            🎓 Education
+                        </button>
+                        <button onclick="showSection('skills')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+                            🛠️ Skills & Expertise
+                        </button>
+                        <button onclick="showSection('certifications')" class="w-full text-left p-3 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+                            📜 Certifications
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="saveProfile()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-semibold">
+                            💾 Save All Changes
+                        </button>
+                        <button onclick="exportData()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold">
+                            📤 Export Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-2">
+                <!-- Personal Information Section -->
+                <div id="personalSection" class="profile-section bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                            <span class="text-blue-600 text-lg">👤</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800">Personal Information</h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Full Name *</label>
+                                <input type="text" id="fullName" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Professional Title</label>
+                                <input type="text" id="professionalTitle" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Senior Software Engineer">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Email Address *</label>
+                                <input type="email" id="email" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="john.doe@example.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Phone Number</label>
+                                <input type="tel" id="phone" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="+1 (555) 123-4567">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Location</label>
+                                <input type="text" id="location" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="San Francisco, CA">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">LinkedIn Profile</label>
+                                <input type="url" id="linkedin" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="https://linkedin.com/in/johndoe">
                             </div>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3">AI is Analyzing Your Resume</h3>
-                        <p class="text-gray-600 mb-6">Our AI is reading your resume, understanding your experience, and organizing your information professionally.</p>
-                        
-                        <div class="grid grid-cols-2 gap-4 text-sm text-blue-700">
-                            <div class="bg-blue-50 rounded-lg p-3">
-                                <div class="font-semibold">🔍 Reading Content</div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Website/Portfolio</label>
+                                <input type="url" id="portfolio" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="https://yourportfolio.com">
                             </div>
-                            <div class="bg-blue-50 rounded-lg p-3">
-                                <div class="font-semibold">🎯 Identifying Skills</div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Target Salary Range</label>
+                                <input type="text" id="targetSalary" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="$80,000 - $120,000">
                             </div>
-                            <div class="bg-blue-50 rounded-lg p-3">
-                                <div class="font-semibold">📊 Extracting Experience</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Visa Status</label>
+                                <select id="visaStatus" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                                    <option value="">Select visa status</option>
+                                    <option value="citizen">Citizen</option>
+                                    <option value="permanent_resident">Permanent Resident</option>
+                                    <option value="work_visa">Work Visa</option>
+                                    <option value="student_visa">Student Visa</option>
+                                    <option value="requires_sponsorship">Requires Sponsorship</option>
+                                </select>
                             </div>
-                            <div class="bg-blue-50 rounded-lg p-3">
-                                <div class="font-semibold">✨ Organizing Data</div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Willing to Relocate?</label>
+                                <select id="relocate" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                                    <option value="">Select preference</option>
+                                    <option value="yes">Yes, anywhere</option>
+                                    <option value="within_country">Within country</option>
+                                    <option value="specific_locations">Specific locations only</option>
+                                    <option value="no">No</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Resume Form -->
-                <div id="resumeForm" class="space-y-6">
-                    <!-- Personal Information -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <span class="text-blue-600 text-lg">👤</span>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Personal Information</h3>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Full Name</label>
-                                <input type="text" id="fullName" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Professional Title</label>
-                                <input type="text" id="professionalTitle" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Email Address</label>
-                                <input type="email" id="email" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Phone Number</label>
-                                <input type="tel" id="phone" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Location</label>
-                                <input type="text" id="location" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">LinkedIn/Portfolio</label>
-                                <input type="url" id="linkedin" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Professional Summary -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                                <span class="text-green-600 text-lg">📝</span>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Professional Summary</h3>
-                        </div>
-                        <textarea id="summary" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition h-32" placeholder="AI will create a compelling professional summary based on your experience..."></textarea>
-                    </div>
-
-                    <!-- Work Experience -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                                <span class="text-orange-600 text-lg">💼</span>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Work Experience</h3>
-                        </div>
-                        <textarea id="experience" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition h-40" placeholder="AI will extract and organize your work history and achievements..."></textarea>
-                    </div>
-
-                    <!-- Education -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                                <span class="text-purple-600 text-lg">🎓</span>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Education</h3>
-                        </div>
-                        <textarea id="education" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition h-32" placeholder="AI will identify your educational background and qualifications..."></textarea>
-                    </div>
-
-                    <!-- Skills -->
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                                <span class="text-red-600 text-lg">🛠️</span>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Skills & Expertise</h3>
-                        </div>
-                        <textarea id="skills" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition h-32" placeholder="AI will categorize your technical and soft skills..."></textarea>
+                <!-- Other sections will be added here (summary, experience, education, skills, certifications) -->
+                <div id="otherSections" class="hidden">
+                    <!-- These will be implemented in Phase 2 -->
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">🚧</div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Section Under Development</h3>
+                        <p class="text-gray-600">This section will be available in the next update!</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast Notifications -->
+    <div id="toast" class="fixed top-4 right-4 p-4 rounded-xl shadow-lg z-50 transform translate-x-96 transition-transform duration-300 hidden">
+        <div class="flex items-center space-x-3">
+            <span id="toastIcon">✅</span>
+            <span id="toastMessage" class="font-semibold"></span>
+        </div>
+    </div>
+
     <script>
-        // ==================== AI RESUME PROCESSING ====================
+        // ==================== FIREBASE CONFIGURATION ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_Si4j_KI1ufVg0_tthDFZjkrnYs-XNtE",
+            authDomain: "resume-ai-platform.firebaseapp.com",
+            projectId: "resume-ai-platform",
+            storageBucket: "resume-ai-platform.firebasestorage.app",
+            messagingSenderId: "246570862355",
+            appId: "1:246570862355:web:4f4e2e3e3fdf366d95bce6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Current user data
+        let currentUser = null;
+        let userProfile = {};
+
+        // ==================== AUTHENTICATION FUNCTIONS ====================
         
-        // File upload handler
-        document.getElementById('resumeUpload').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Show AI processing animation
-            showAIProcessing();
-            
-            try {
-                // Simulate AI processing (3 seconds)
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                // Process with AI simulation
-                await processResumeWithAI(file);
-                
-            } catch (error) {
-                showUploadStatus('❌ Error processing resume. Please try again or enter information manually.', 'error');
-                hideAIProcessing();
-            }
-        });
-
-        // AI Resume Processing Simulation
-        async function processResumeWithAI(file) {
-            // Extract basic info from filename
-            const userInfo = extractUserInfoFromFilename(file.name);
-            
-            // Simulate AI analysis results
-            const aiAnalysis = {
-                name: userInfo.name,
-                title: userInfo.title,
-                email: userInfo.email,
-                phone: userInfo.phone,
-                location: userInfo.location,
-                linkedin: userInfo.linkedin,
-                summary: generateAISummary(userInfo.name, userInfo.title),
-                experience: generateAIExperience(userInfo.title),
-                education: generateAIEducation(),
-                skills: generateAISkills(userInfo.title),
-                suggestions: [
-                    "Add specific achievements with metrics and numbers",
-                    "Include relevant keywords from your industry",
-                    "Highlight your most impressive accomplishments",
-                    "Tailor your summary to your target role"
-                ]
-            };
-            
-            // Fill the form with AI results
-            fillFormWithAIResults(aiAnalysis);
-            
-            // Show success and suggestions
-            showUploadStatus('✅ AI has successfully analyzed your resume! Review and edit the information below.', 'success');
-            showAISuggestions(aiAnalysis.suggestions);
-            hideAIProcessing();
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
         }
 
-        // Extract user info from filename
-        function extractUserInfoFromFilename(filename) {
-            const name = filename.replace(/\.[^/.]+$/, "")
-                              .replace(/[_-]/g, " ")
-                              .replace(/\b(resume|cv|curriculum|vitae)\b/gi, "")
-                              .trim();
-            
-            const formattedName = name.split(' ')
-                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                    .join(' ');
-            
-            return {
-                name: formattedName || "Your Name",
-                title: "Professional",
-                email: "your.email@example.com",
-                phone: "+1 (555) 000-0000",
-                location: "Your City, Country",
-                linkedin: "https://linkedin.com/in/yourprofile"
-            };
+        function showSignup() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
         }
 
-        // AI-generated content
-        function generateAISummary(name, title) {
-            const firstName = name.split(' ')[0] || "You";
-            return `${firstName} is a ${title.toLowerCase()} with demonstrated experience and strong skills. Proven track record of achievement and excellent problem-solving abilities. Ready to bring valuable expertise to new challenges and opportunities.`;
-        }
+        function signup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
 
-        function generateAIExperience(title) {
-            return `• ${title} with comprehensive experience in the field\n• Strong background in relevant areas with proven results\n• Demonstrated ability to handle responsibilities effectively\n• Track record of successful project completion and team collaboration\n• Please add your specific job titles, companies, and dates\n• Include measurable achievements and key responsibilities`;
-        }
-
-        function generateAIEducation() {
-            return `• Please list your educational background here\n• Include degrees, institutions, and graduation years\n• Add relevant certifications, training, or special courses\n• Mention academic achievements or honors if applicable`;
-        }
-
-        function generateAISkills(title) {
-            const skillSets = {
-                'Professional': "• Communication and interpersonal skills\n• Problem-solving and analytical abilities\n• Project management and organization\n• Team collaboration and leadership\n• Technical proficiency in relevant tools",
-                'Technical': "• Programming languages and frameworks\n• Software development and engineering\n• System architecture and design\n• Database management and administration\n• Cloud platforms and DevOps tools",
-                'Business': "• Strategic planning and analysis\n• Financial management and budgeting\n• Marketing and sales strategies\n• Operations and process improvement\n• Stakeholder management and negotiation"
-            };
-            
-            return skillSets[title] || skillSets['Professional'];
-        }
-
-        // Fill form with AI results
-        function fillFormWithAIResults(aiResults) {
-            document.getElementById('fullName').value = aiResults.name;
-            document.getElementById('professionalTitle').value = aiResults.title;
-            document.getElementById('email').value = aiResults.email;
-            document.getElementById('phone').value = aiResults.phone;
-            document.getElementById('location').value = aiResults.location;
-            document.getElementById('linkedin').value = aiResults.linkedin;
-            document.getElementById('summary').value = aiResults.summary;
-            document.getElementById('experience').value = aiResults.experience;
-            document.getElementById('education').value = aiResults.education;
-            document.getElementById('skills').value = aiResults.skills;
-            
-            saveFormData();
-        }
-
-        // AI Enhancement Feature
-        async function enhanceWithAI() {
-            const currentData = getFormData();
-            if (!currentData.fullName && !currentData.summary) {
-                showUploadStatus('Please fill in some information first for AI enhancement.', 'error');
+            if (!name || !email || !password) {
+                showToast('Please fill in all fields', 'error');
                 return;
             }
 
-            showUploadStatus('🧠 AI is enhancing your content...', 'processing');
-            
-            // Simulate AI enhancement (2 seconds)
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Enhanced content
-            const enhancedSummary = `Accomplished ${currentData.professionalTitle || 'professional'} ${currentData.fullName ? currentData.fullName.split(' ')[0] : 'with'} proven expertise in relevant field. ${currentData.summary || 'Strong background with excellent capabilities.'} Demonstrated success in delivering results and driving initiatives forward. Committed to excellence and continuous improvement.`;
-            
-            document.getElementById('summary').value = enhancedSummary;
-            showUploadStatus('✅ AI has enhanced your professional summary!', 'success');
-            saveFormData();
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    
+                    // Create initial user profile
+                    userProfile = {
+                        personal: {
+                            fullName: name,
+                            email: email,
+                            professionalTitle: '',
+                            phone: '',
+                            location: '',
+                            linkedin: '',
+                            portfolio: '',
+                            targetSalary: '',
+                            visaStatus: '',
+                            relocate: ''
+                        },
+                        summary: '',
+                        experience: [],
+                        education: [],
+                        skills: [],
+                        certifications: [],
+                        createdAt: new Date(),
+                        lastUpdated: new Date()
+                    };
+
+                    // Save profile to Firestore
+                    return db.collection('profiles').doc(currentUser.uid).set(userProfile);
+                })
+                .then(() => {
+                    showToast('Account created successfully!', 'success');
+                    showApp();
+                    loadUserProfile();
+                })
+                .catch((error) => {
+                    showToast('Error creating account: ' + error.message, 'error');
+                });
         }
 
-        // ==================== UI FUNCTIONS ====================
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    showToast('Welcome back!', 'success');
+                    showApp();
+                    loadUserProfile();
+                })
+                .catch((error) => {
+                    showToast('Error signing in: ' + error.message, 'error');
+                });
+        }
+
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    currentUser = null;
+                    userProfile = {};
+                    showToast('Signed out successfully', 'success');
+                    showAuth();
+                })
+                .catch((error) => {
+                    showToast('Error signing out: ' + error.message, 'error');
+                });
+        }
+
+        // ==================== PROFILE MANAGEMENT ====================
         
-        function showAIProcessing() {
-            document.getElementById('aiProcessing').classList.remove('hidden');
-            document.getElementById('resumeForm').style.opacity = '0.6';
-            document.getElementById('uploadStatus').innerHTML = '<div class="text-blue-600 font-semibold">🔄 AI is processing your resume...</div>';
+        function loadUserProfile() {
+            if (!currentUser) return;
+
+            db.collection('profiles').doc(currentUser.uid).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        userProfile = doc.data();
+                        populateForm();
+                        updateProgress();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading profile:', error);
+                });
         }
 
-        function hideAIProcessing() {
-            document.getElementById('aiProcessing').classList.add('hidden');
-            document.getElementById('resumeForm').style.opacity = '1';
+        function populateForm() {
+            if (!userProfile.personal) return;
+
+            const personal = userProfile.personal;
+            document.getElementById('fullName').value = personal.fullName || '';
+            document.getElementById('professionalTitle').value = personal.professionalTitle || '';
+            document.getElementById('email').value = personal.email || '';
+            document.getElementById('phone').value = personal.phone || '';
+            document.getElementById('location').value = personal.location || '';
+            document.getElementById('linkedin').value = personal.linkedin || '';
+            document.getElementById('portfolio').value = personal.portfolio || '';
+            document.getElementById('targetSalary').value = personal.targetSalary || '';
+            document.getElementById('visaStatus').value = personal.visaStatus || '';
+            document.getElementById('relocate').value = personal.relocate || '';
+
+            // Update welcome message
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${personal.fullName || 'there'}!`;
+            document.getElementById('userGreeting').textContent = `Hi, ${personal.fullName || 'User'}`;
         }
 
-        function showUploadStatus(message, type) {
-            const statusEl = document.getElementById('uploadStatus');
-            const colors = {
-                success: 'text-green-600 bg-green-50 border border-green-200',
-                error: 'text-red-600 bg-red-50 border border-red-200',
-                processing: 'text-blue-600 bg-blue-50 border border-blue-200'
-            };
-            
-            statusEl.innerHTML = `<div class="p-3 rounded-lg ${colors[type] || colors.processing} font-semibold">${message}</div>`;
-        }
+        function saveProfile() {
+            if (!currentUser) return;
 
-        function showAISuggestions(suggestions) {
-            const container = document.getElementById('aiSuggestions');
-            const content = document.getElementById('suggestionsContent');
-            
-            content.innerHTML = suggestions.map(suggestion => 
-                `<div class="flex items-start space-x-2">
-                    <span class="text-green-500 mt-1">•</span>
-                    <span>${suggestion}</span>
-                </div>`
-            ).join('');
-            
-            container.classList.remove('hidden');
-        }
-
-        // ==================== FORM MANAGEMENT ====================
-        
-        function getFormData() {
-            return {
+            // Update personal information
+            userProfile.personal = {
                 fullName: document.getElementById('fullName').value,
                 professionalTitle: document.getElementById('professionalTitle').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 location: document.getElementById('location').value,
                 linkedin: document.getElementById('linkedin').value,
-                summary: document.getElementById('summary').value,
-                experience: document.getElementById('experience').value,
-                education: document.getElementById('education').value,
-                skills: document.getElementById('skills').value
+                portfolio: document.getElementById('portfolio').value,
+                targetSalary: document.getElementById('targetSalary').value,
+                visaStatus: document.getElementById('visaStatus').value,
+                relocate: document.getElementById('relocate').value
             };
+
+            userProfile.lastUpdated = new Date();
+
+            db.collection('profiles').doc(currentUser.uid).set(userProfile)
+                .then(() => {
+                    showToast('Profile saved successfully!', 'success');
+                    updateProgress();
+                })
+                .catch((error) => {
+                    showToast('Error saving profile: ' + error.message, 'error');
+                });
         }
 
-        function saveFormData() {
-            const formData = getFormData();
-            localStorage.setItem('resumeData', JSON.stringify(formData));
-        }
-
-        function clearForm() {
-            if (confirm('Are you sure you want to clear all fields? This cannot be undone.')) {
-                document.getElementById('fullName').value = '';
-                document.getElementById('professionalTitle').value = '';
-                document.getElementById('email').value = '';
-                document.getElementById('phone').value = '';
-                document.getElementById('location').value = '';
-                document.getElementById('linkedin').value = '';
-                document.getElementById('summary').value = '';
-                document.getElementById('experience').value = '';
-                document.getElementById('education').value = '';
-                document.getElementById('skills').value = '';
-                document.getElementById('aiSuggestions').classList.add('hidden');
-                document.getElementById('uploadStatus').innerHTML = '<p class="text-sm text-gray-500">AI will analyze and auto-fill your information</p>';
-                
-                localStorage.removeItem('resumeData');
-            }
-        }
-
-        // ==================== DOWNLOAD FUNCTIONS ====================
+        // ==================== PROGRESS TRACKING ====================
         
-        function downloadPDF() {
-            const name = document.getElementById('fullName').value || 'resume';
-            const content = generateResumeContent();
-            alert(`✅ PDF Resume Generated!\n\nFile: ${name}.pdf\n\nYour professional resume is ready to download. In a production environment, this would generate an actual PDF file with your content.`);
+        function updateProgress() {
+            if (!userProfile.personal) return;
+
+            let totalScore = 0;
+            let maxScore = 0;
+
+            // Personal Information Score (40 points max)
+            const personalFields = ['fullName', 'email', 'professionalTitle', 'phone', 'location'];
+            let personalScore = 0;
+            personalFields.forEach(field => {
+                if (userProfile.personal[field] && userProfile.personal[field].trim()) {
+                    personalScore += 8; // 8 points per field
+                }
+            });
+            totalScore += Math.min(personalScore, 40);
+            maxScore += 40;
+
+            // Update progress bars
+            const personalPercent = Math.round((personalScore / 40) * 100);
+            document.getElementById('basicInfoScore').textContent = personalPercent + '%';
+            document.getElementById('profileProgress').style.width = personalPercent + '%';
+            document.getElementById('progressText').textContent = personalPercent + '% Complete';
+
+            // Other sections will be 0% for now (Phase 2)
+            document.getElementById('experienceScore').textContent = '0%';
+            document.getElementById('educationScore').textContent = '0%';
+            document.getElementById('skillsScore').textContent = '0%';
         }
 
-        function downloadWord() {
-            const name = document.getElementById('fullName').value || 'resume';
-            const content = generateResumeContent();
-            alert(`✅ Word Document Generated!\n\nFile: ${name}.docx\n\nYour professional resume is ready to download. In a production environment, this would generate an actual Word document.`);
+        // ==================== UI FUNCTIONS ====================
+        
+        function showAuth() {
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('appSection').classList.add('hidden');
+            document.getElementById('authButtons').classList.remove('hidden');
+            document.getElementById('userMenu').classList.add('hidden');
         }
 
-        function generateResumeContent() {
-            const data = getFormData();
-            return `
-                ${data.fullName || 'Your Name'}
-                ${data.professionalTitle || 'Professional Title'}
-                
-                CONTACT INFORMATION
-                Email: ${data.email || 'N/A'}
-                Phone: ${data.phone || 'N/A'}
-                Location: ${data.location || 'N/A'}
-                LinkedIn: ${data.linkedin || 'N/A'}
-                
-                PROFESSIONAL SUMMARY
-                ${data.summary || 'Your professional summary'}
-                
-                WORK EXPERIENCE
-                ${data.experience || 'Your work experience'}
-                
-                EDUCATION
-                ${data.education || 'Your education'}
-                
-                SKILLS
-                ${data.skills || 'Your skills'}
-            `;
+        function showApp() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            document.getElementById('authButtons').classList.add('hidden');
+            document.getElementById('userMenu').classList.remove('hidden');
         }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.profile-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            if (sectionName === 'personal') {
+                document.getElementById('personalSection').classList.remove('hidden');
+            } else {
+                document.getElementById('otherSections').classList.remove('hidden');
+                // In Phase 2, we'll show the actual sections
+            }
+
+            // Update navigation buttons
+            document.querySelectorAll('#navigationSidebar button').forEach(button => {
+                button.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-700');
+                button.classList.add('text-gray-700', 'hover:bg-gray-50');
+            });
+            
+            event.target.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
+            event.target.classList.remove('text-gray-700', 'hover:bg-gray-50');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Set icon and color based on type
+            if (type === 'success') {
+                toast.className = toast.className.replace('bg-red-100 text-red-800 border-red-200', '');
+                toast.className += ' bg-green-100 text-green-800 border border-green-200';
+                toastIcon.textContent = '✅';
+            } else if (type === 'error') {
+                toast.className = toast.className.replace('bg-green-100 text-green-800 border-green-200', '');
+                toast.className += ' bg-red-100 text-red-800 border border-red-200';
+                toastIcon.textContent = '❌';
+            }
+
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden', 'translate-x-96');
+            toast.classList.add('translate-x-0');
+
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('translate-x-0');
+                toast.classList.add('translate-x-96');
+            }, 3000);
+        }
+
+        function exportData() {
+            showToast('Export feature coming in Phase 2!', 'success');
+        }
+
+        // ==================== AUTO-SAVE ====================
+        
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', () => {
+                // Auto-save after 2 seconds of inactivity
+                clearTimeout(window.autoSaveTimeout);
+                window.autoSaveTimeout = setTimeout(saveProfile, 2000);
+            });
+        });
 
         // ==================== INITIALIZATION ====================
         
-        // Auto-save functionality
-        document.querySelectorAll('input, textarea').forEach(element => {
-            element.addEventListener('input', saveFormData);
+        // Check auth state on load
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                showApp();
+                loadUserProfile();
+            } else {
+                showAuth();
+            }
         });
 
-        // Load saved data on page load
+        // Initialize the first section
         document.addEventListener('DOMContentLoaded', function() {
-            const savedData = localStorage.getItem('resumeData');
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                document.getElementById('fullName').value = formData.fullName || '';
-                document.getElementById('professionalTitle').value = formData.professionalTitle || '';
-                document.getElementById('email').value = formData.email || '';
-                document.getElementById('phone').value = formData.phone || '';
-                document.getElementById('location').value = formData.location || '';
-                document.getElementById('linkedin').value = formData.linkedin || '';
-                document.getElementById('summary').value = formData.summary || '';
-                document.getElementById('experience').value = formData.experience || '';
-                document.getElementById('education').value = formData.education || '';
-                document.getElementById('skills').value = formData.skills || '';
-                
-                showUploadStatus('📁 Previously saved resume loaded successfully!', 'success');
-            }
+            showSection('personal');
         });
     </script>
 </body>
