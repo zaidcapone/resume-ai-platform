@@ -132,9 +132,21 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="bg-black text-green-400">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="cyber-loader mx-auto mb-4"></div>
+            <p class="text-green-400 neon-text">PROCESSING...</p>
+        </div>
+    </div>
+
     <!-- Matrix Background -->
     <div class="matrix-bg"></div>
     <canvas class="matrix-rain" id="matrixCanvas"></canvas>
@@ -336,7 +348,7 @@
                             <p class="text-green-600">>> ANALYSIS DATA WILL APPEAR HERE...</p>
                         </div>
                         
-                        <div class="mt-6 grid grid-cols-2 gap-4" id="matchScores" class="hidden">
+                        <div class="mt-6 grid grid-cols-2 gap-4 hidden" id="matchScores">
                             <div class="text-center bg-green-400/20 rounded-lg p-4 cyber-border">
                                 <div class="text-2xl font-bold text-green-400 neon-text" id="skillsMatch">0%</div>
                                 <div class="text-sm text-green-300">SKILLS MATCH</div>
@@ -421,6 +433,21 @@
         let currentUser = null;
         let userProfile = {};
 
+        // ==================== LOADING FUNCTIONS ====================
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+
         // ==================== AUTHENTICATION ====================
         function showLogin() {
             document.getElementById('loginForm').classList.remove('hidden');
@@ -436,6 +463,11 @@
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
+
+            if (!name || !email || !password) {
+                showNotification('ERROR: Please fill all fields', true);
+                return;
+            }
 
             showLoading();
             auth.createUserWithEmailAndPassword(email, password)
@@ -466,6 +498,11 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
+            if (!email || !password) {
+                showNotification('ERROR: Please fill all fields', true);
+                return;
+            }
+
             showLoading();
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
@@ -489,6 +526,9 @@
                 hideLoading();
                 showNotification('SYSTEM: Logged out');
                 showAuth();
+            }).catch((error) => {
+                hideLoading();
+                showNotification('ERROR: ' + error.message, true);
             });
         }
 
@@ -503,6 +543,10 @@
                         updateProgress();
                     }
                     hideLoading();
+                })
+                .catch((error) => {
+                    hideLoading();
+                    console.error('Error loading profile:', error);
                 });
         }
 
@@ -521,7 +565,7 @@
             // Load experiences
             const expContainer = document.getElementById('experienceContainer');
             expContainer.innerHTML = '';
-            if (userProfile.experience) {
+            if (userProfile.experience && userProfile.experience.length > 0) {
                 userProfile.experience.forEach(exp => addExperience(exp));
             } else {
                 addExperience();
@@ -530,7 +574,7 @@
             // Load education
             const eduContainer = document.getElementById('educationContainer');
             eduContainer.innerHTML = '';
-            if (userProfile.education) {
+            if (userProfile.education && userProfile.education.length > 0) {
                 userProfile.education.forEach(edu => addEducation(edu));
             } else {
                 addEducation();
@@ -539,6 +583,34 @@
 
         function saveProfile() {
             showLoading();
+            
+            // Collect experience data
+            const experiences = [];
+            document.querySelectorAll('#experienceContainer > div').forEach(expElement => {
+                const title = expElement.querySelector('.exp-title')?.value || '';
+                const company = expElement.querySelector('.exp-company')?.value || '';
+                const start = expElement.querySelector('.exp-start')?.value || '';
+                const end = expElement.querySelector('.exp-end')?.value || '';
+                const description = expElement.querySelector('.exp-desc')?.value || '';
+                
+                if (title || company) {
+                    experiences.push({ title, company, start, end, description });
+                }
+            });
+
+            // Collect education data
+            const education = [];
+            document.querySelectorAll('#educationContainer > div').forEach(eduElement => {
+                const degree = eduElement.querySelector('.edu-degree')?.value || '';
+                const school = eduElement.querySelector('.edu-school')?.value || '';
+                const year = eduElement.querySelector('.edu-year')?.value || '';
+                const gpa = eduElement.querySelector('.edu-gpa')?.value || '';
+                
+                if (degree || school) {
+                    education.push({ degree, school, year, gpa });
+                }
+            });
+
             userProfile.personal = {
                 fullName: document.getElementById('fullName').value,
                 professionalTitle: document.getElementById('professionalTitle').value,
@@ -549,6 +621,8 @@
             };
             userProfile.summary = document.getElementById('summary').value;
             userProfile.skills = document.getElementById('skills').value;
+            userProfile.experience = experiences;
+            userProfile.education = education;
 
             db.collection('profiles').doc(currentUser.uid).set(userProfile)
                 .then(() => {
@@ -599,11 +673,17 @@
         }
 
         function removeExperience(id) {
-            document.querySelector(`[data-id="${id}"]`).remove();
+            const element = document.querySelector(`[data-id="${id}"]`);
+            if (element) {
+                element.remove();
+            }
         }
 
         function removeEducation(id) {
-            document.querySelector(`[data-id="${id}"]`).remove();
+            const element = document.querySelector(`[data-id="${id}"]`);
+            if (element) {
+                element.remove();
+            }
         }
 
         // ==================== RESUME GENERATOR ====================
@@ -730,39 +810,21 @@
         }
 
         // ==================== UTILITY FUNCTIONS ====================
-        function showLoading() {
-            // Create loading overlay if it doesn't exist
-            if (!document.getElementById('loadingOverlay')) {
-                const overlay = document.createElement('div');
-                overlay.id = 'loadingOverlay';
-                overlay.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50';
-                overlay.innerHTML = `
-                    <div class="text-center">
-                        <div class="cyber-loader mx-auto mb-4"></div>
-                        <p class="text-green-400 neon-text">PROCESSING...</p>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
-            }
-        }
-
-        function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.remove();
-            }
-        }
-
         function showNotification(message, isError = false) {
+            // Remove existing notifications
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+            
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg border ${
+            notification.className = `notification fixed top-4 right-4 p-4 rounded-lg border ${
                 isError ? 'bg-red-500/20 border-red-400 text-red-400' : 'bg-green-500/20 border-green-400 text-green-400'
             } z-50 cyber-border neon-text`;
             notification.textContent = message;
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.remove();
+                if (notification.parentNode) {
+                    notification.remove();
+                }
             }, 3000);
         }
 
@@ -779,17 +841,18 @@
 
         // Initialize first sections and matrix rain
         document.addEventListener('DOMContentLoaded', function() {
-            showProfileSection('personal');
-            
             // Start matrix rain
             const canvas = document.getElementById('matrixCanvas');
-            const matrix = new MatrixRain(canvas);
-            matrix.start();
+            if (canvas) {
+                const matrix = new MatrixRain(canvas);
+                matrix.start();
+            }
             
-            // Add some cyber sound effects on interactions
-            document.addEventListener('click', function() {
-                // You could add sound effects here
-            });
+            // Initialize first section
+            showProfileSection('personal');
+            
+            // Ensure loading overlay is hidden on startup
+            hideLoading();
         });
     </script>
 </body>
